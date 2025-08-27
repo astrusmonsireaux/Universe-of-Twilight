@@ -246,6 +246,124 @@ class Player {
         }
     }
     
+    // Ability System Methods
+    activateTelepathy() {
+        if (!this.abilities.telepathy || this.abilityCooldowns.telepathy > 0) {
+            return false;
+        }
+        
+        if (this.energy < this.abilityCosts.telepathy) {
+            this.showMessage('Insufficient energy for telepathy');
+            return false;
+        }
+        
+        this.energy -= this.abilityCosts.telepathy;
+        this.activeAbilities.telepathy = true;
+        this.abilityTimers.telepathy = this.abilityDurations.telepathy;
+        this.abilityCooldowns.telepathy = 30; // 30 second cooldown
+        
+        // Visual effect
+        this.mesh.material.emissive = new THREE.Color(0x0066ff);
+        
+        this.showMessage('Telepathy activated - sensing nearby life forms');
+        return true;
+    }
+    
+    activateTimePerception() {
+        if (!this.abilities.timePerception || this.abilityCooldowns.timePerception > 0) {
+            return false;
+        }
+        
+        if (this.energy < this.abilityCosts.timePerception) {
+            this.showMessage('Insufficient energy for time perception');
+            return false;
+        }
+        
+        this.energy -= this.abilityCosts.timePerception;
+        this.activeAbilities.timePerception = true;
+        this.abilityTimers.timePerception = this.abilityDurations.timePerception;
+        this.abilityCooldowns.timePerception = 60; // 60 second cooldown
+        
+        // Visual effect
+        this.mesh.material.emissive = new THREE.Color(0xff6600);
+        
+        this.showMessage('Time perception activated - time appears to slow');
+        return true;
+    }
+    
+    updateAbilities(deltaTime) {
+        // Update cooldowns
+        Object.keys(this.abilityCooldowns).forEach(ability => {
+            if (this.abilityCooldowns[ability] > 0) {
+                this.abilityCooldowns[ability] -= deltaTime;
+            }
+        });
+        
+        // Update active ability timers
+        Object.keys(this.abilityTimers).forEach(ability => {
+            if (this.abilityTimers[ability] > 0) {
+                this.abilityTimers[ability] -= deltaTime;
+                
+                if (this.abilityTimers[ability] <= 0) {
+                    this.deactivateAbility(ability);
+                }
+            }
+        });
+    }
+    
+    deactivateAbility(ability) {
+        this.activeAbilities[ability] = false;
+        this.abilityTimers[ability] = 0;
+        
+        // Reset visual effect
+        this.updatePhotosynthesis(window.game ? window.game.gameTime : 0);
+        
+        if (ability === 'telepathy') {
+            this.showMessage('Telepathy deactivated');
+        } else if (ability === 'timePerception') {
+            this.showMessage('Time perception deactivated');
+        }
+    }
+    
+    unlockAbility(ability) {
+        if (ability === 'telepathy' || ability === 'timePerception') {
+            this.abilities[ability] = true;
+            this.showMessage(`${ability.charAt(0).toUpperCase() + ability.slice(1)} ability unlocked!`);
+            return true;
+        }
+        return false;
+    }
+    
+    showMessage(message) {
+        if (window.game && window.game.hud) {
+            window.game.hud.showMessage(message);
+        }
+    }
+    
+    // Additional methods for HUD integration
+    getAbilityCooldown(ability) {
+        return this.abilityCooldowns[ability] || 0;
+    }
+    
+    getAbilityTimer(ability) {
+        return this.abilityTimers[ability] || 0;
+    }
+    
+    isAbilityActive(ability) {
+        return this.activeAbilities[ability] || false;
+    }
+    
+    useAbility(ability) {
+        switch (ability) {
+            case 'telepathy':
+                return this.activateTelepathy();
+            case 'timePerception':
+                return this.activateTimePerception();
+            default:
+                return false;
+        }
+    }
+    
     checkTerrainCollision() {
         // Get terrain height at current position
         if (window.game && window.game.currentPlanet) {
