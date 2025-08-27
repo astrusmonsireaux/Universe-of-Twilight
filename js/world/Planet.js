@@ -149,6 +149,126 @@ class Planet {
                 this.addVegetationAt(x, z, biome);
             }
         }
+        
+        // Add some items to the world
+        this.spawnItems();
+    }
+    
+    spawnItems() {
+        const itemCount = Math.floor(this.terrain.size * this.terrain.size / 50000);
+        
+        for (let i = 0; i < itemCount; i++) {
+            const x = (Math.random() - 0.5) * this.terrain.size * 0.9;
+            const z = (Math.random() - 0.5) * this.terrain.size * 0.9;
+            const biome = this.terrain.getBiomeAt(x, z);
+            const height = this.getHeightAt(x, z);
+            
+            const item = this.generateItemForBiome(biome);
+            if (item) {
+                this.spawnItemAt(x, height + 1, z, item);
+            }
+        }
+    }
+    
+    generateItemForBiome(biome) {
+        const itemChances = {
+            'forest': [
+                { name: 'wood', chance: 0.4 },
+                { name: 'herb', chance: 0.3 },
+                { name: 'fruit', chance: 0.2 },
+                { name: 'stick', chance: 0.1 }
+            ],
+            'grassland': [
+                { name: 'herb', chance: 0.5 },
+                { name: 'stone', chance: 0.3 },
+                { name: 'fruit', chance: 0.2 }
+            ],
+            'desert': [
+                { name: 'stone', chance: 0.6 },
+                { name: 'cactus', chance: 0.3 },
+                { name: 'water', chance: 0.1 }
+            ],
+            'mountain': [
+                { name: 'stone', chance: 0.7 },
+                { name: 'iron_ore', chance: 0.2 },
+                { name: 'coal', chance: 0.1 }
+            ],
+            'beach': [
+                { name: 'shell', chance: 0.4 },
+                { name: 'stone', chance: 0.3 },
+                { name: 'water', chance: 0.3 }
+            ]
+        };
+        
+        const items = itemChances[biome] || itemChances['grassland'];
+        const random = Math.random();
+        let cumulativeChance = 0;
+        
+        for (const item of items) {
+            cumulativeChance += item.chance;
+            if (random <= cumulativeChance) {
+                return {
+                    name: item.name,
+                    count: Math.floor(Math.random() * 3) + 1,
+                    type: 'resource'
+                };
+            }
+        }
+        
+        return null;
+    }
+    
+    spawnItemAt(x, y, z, item) {
+        const itemObject = {
+            item: item,
+            position: { x, y, z },
+            render: (scene) => {
+                // Create simple item mesh
+                const geometry = new THREE.SphereGeometry(0.3, 8, 8);
+                const material = new THREE.MeshLambertMaterial({ 
+                    color: this.getItemColor(item.name),
+                    emissive: this.getItemColor(item.name),
+                    emissiveIntensity: 0.2
+                });
+                
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.position.set(x, y, z);
+                
+                // Add floating animation
+                mesh.userData.originalY = y;
+                mesh.userData.animationTime = Math.random() * Math.PI * 2;
+                
+                scene.addObject(`item_${x}_${z}`, mesh);
+            },
+            update: (deltaTime) => {
+                // Update floating animation
+                const mesh = scene.getObject(`item_${x}_${z}`);
+                if (mesh) {
+                    mesh.userData.animationTime += deltaTime;
+                    mesh.position.y = mesh.userData.originalY + Math.sin(mesh.userData.animationTime * 2) * 0.5;
+                    mesh.rotation.y += deltaTime;
+                }
+            }
+        };
+        
+        this.objects.set(`item_${x}_${z}`, itemObject);
+    }
+    
+    getItemColor(itemName) {
+        const colors = {
+            'wood': 0x8B4513,
+            'stone': 0x808080,
+            'herb': 0x228B22,
+            'fruit': 0xFF6347,
+            'stick': 0xD2691E,
+            'cactus': 0x228B22,
+            'water': 0x4169E1,
+            'shell': 0xFFF8DC,
+            'iron_ore': 0x696969,
+            'coal': 0x2F4F4F
+        };
+        
+        return colors[itemName] || 0xFFFFFF;
     }
     
     getVegetationChance(biome) {

@@ -9,6 +9,8 @@ class Controls {
         this.run = false;
         this.interact = false;
         this.drop = false;
+        this.craft = false;
+        this.map = false;
         
         // Mouse controls
         this.mouseX = 0;
@@ -111,7 +113,6 @@ class Controls {
                 this.jump = true;
                 break;
             case 'ShiftLeft':
-            case 'ShiftRight':
                 this.run = true;
                 break;
             case 'KeyE':
@@ -119,6 +120,15 @@ class Controls {
                 break;
             case 'KeyQ':
                 this.drop = true;
+                break;
+            case 'KeyC':
+                this.craft = true;
+                break;
+            case 'KeyM':
+                this.map = true;
+                break;
+            case 'Escape':
+                this.toggleMenu();
                 break;
         }
     }
@@ -145,7 +155,6 @@ class Controls {
                 this.jump = false;
                 break;
             case 'ShiftLeft':
-            case 'ShiftRight':
                 this.run = false;
                 break;
             case 'KeyE':
@@ -153,6 +162,12 @@ class Controls {
                 break;
             case 'KeyQ':
                 this.drop = false;
+                break;
+            case 'KeyC':
+                this.craft = false;
+                break;
+            case 'KeyM':
+                this.map = false;
                 break;
         }
     }
@@ -317,6 +332,8 @@ class Controls {
         this.run = false;
         this.interact = false;
         this.drop = false;
+        this.craft = false;
+        this.map = false;
         this.mouseDeltaX = 0;
         this.mouseDeltaY = 0;
     }
@@ -334,7 +351,9 @@ class Controls {
                 jump: this.jump,
                 run: this.run,
                 interact: this.interact,
-                drop: this.drop
+                drop: this.drop,
+                craft: this.craft,
+                map: this.map
             },
             mouse: {
                 deltaX: this.mouseDeltaX,

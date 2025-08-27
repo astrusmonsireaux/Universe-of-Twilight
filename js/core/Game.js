@@ -65,12 +65,16 @@ class Game {
             this.physics = new Physics();
             this.weather = new Weather();
             this.solarSystem = new SolarSystem();
+            this.orbitalMechanics = new OrbitalMechanics();
             
             // Initialize UI systems
             this.hud = new HUD();
             this.menu = new Menu();
             this.crafting = new Crafting();
             this.map = new Map();
+            
+            // Connect systems
+            this.connectSystems();
             
             // Load initial planet (Chimera)
             await this.loadPlanet('Chimera');
@@ -98,21 +102,32 @@ class Game {
     async loadPlanet(planetName) {
         console.log(`Loading planet: ${planetName}`);
         
-        // Create planet instance
+        // Unload current planet
+        if (this.currentPlanet) {
+            this.currentPlanet = null;
+        }
+        
+        // Create new planet
         this.currentPlanet = new Planet(planetName);
         await this.currentPlanet.init();
         
-        // Update player position to planet surface
+        // Set player spawn point
         const spawnPoint = this.currentPlanet.getSpawnPoint();
         this.player.setPosition(spawnPoint.x, spawnPoint.y, spawnPoint.z);
         
-        // Update camera
-        this.camera.follow(this.player);
+        // Update camera target
+        this.camera.setTarget(this.player);
+        
+        // Update current location
+        this.currentLocation = planetName;
         
         // Update HUD
         this.hud.updateLocation(planetName);
         
-        this.currentLocation = planetName;
+        // Add planet to scene
+        this.currentPlanet.render(this.scene);
+        
+        console.log(`Planet ${planetName} loaded successfully`);
     }
     
     start() {
@@ -175,9 +190,16 @@ class Game {
         if (this.currentPlanet) {
             this.currentPlanet.update(deltaTime);
         }
+        
+        // Update enhanced systems
         this.physics.update(deltaTime);
         this.weather.update(deltaTime);
         this.solarSystem.update(deltaTime);
+        
+        // Update orbital mechanics
+        if (this.orbitalMechanics) {
+            this.orbitalMechanics.update(deltaTime);
+        }
         
         // Update UI
         this.hud.update(deltaTime);
@@ -197,28 +219,56 @@ class Game {
         
         // Update weather display
         if (this.weather) {
-            this.hud.updateWeather(this.weather);
+            this.hud.updateWeather(this.weather.getWeatherData());
+        }
+        
+        // Handle player interactions
+        this.handlePlayerInteractions();
+        
+        // Update atmospheric effects
+        if (this.currentPlanet && this.currentPlanet.atmosphere) {
+            this.currentPlanet.atmosphere.update(deltaTime);
         }
     }
     
     render() {
-        // Clear scene
-        this.scene.clear();
+        if (!this.isRunning) return;
         
-        // Render world
+        // Render scene
+        this.scene.render();
+        
+        // Render current planet
         if (this.currentPlanet) {
             this.currentPlanet.render(this.scene);
         }
-        this.solarSystem.render(this.scene);
         
-        // Render player
-        this.player.render(this.scene);
+        // Render solar system
+        if (this.solarSystem) {
+            this.solarSystem.render(this.scene);
+        }
+        
+        // Render weather effects
+        if (this.weather) {
+            this.weather.render(this.scene);
+        }
+        
+        // Render physics objects
+        if (this.physics) {
+            this.physics.render(this.scene);
+        }
+        
+        // Render orbital mechanics
+        if (this.orbitalMechanics) {
+            this.orbitalMechanics.render(this.scene);
+        }
+        
+        // Render atmospheric effects
+        if (this.currentPlanet && this.currentPlanet.atmosphere) {
+            this.currentPlanet.atmosphere.render(this.scene);
+        }
         
         // Render UI
         this.hud.render();
-        
-        // Present to screen
-        this.scene.render(this.camera);
     }
     
     updatePlayerStats(deltaTime) {
@@ -453,23 +503,52 @@ class Game {
     }
     
     addItemToInventory(item) {
-        const emptySlot = this.playerData.inventory.findIndex(slot => slot === null);
-        if (emptySlot !== -1) {
-            this.playerData.inventory[emptySlot] = item;
-            this.hud.updateInventory(this.playerData.inventory);
-            return true;
+        // Find empty slot
+        for (let i = 0; i < this.playerData.inventory.length; i++) {
+            if (!this.playerData.inventory[i]) {
+                this.playerData.inventory[i] = { ...item };
+                this.hud.updateInventory(this.playerData.inventory);
+                return true;
+            }
+        }
+        
+        // Check if item can be stacked
+        for (let i = 0; i < this.playerData.inventory.length; i++) {
+            const existingItem = this.playerData.inventory[i];
+            if (existingItem && existingItem.name === item.name) {
+                existingItem.count = (existingItem.count || 1) + (item.count || 1);
+                this.hud.updateInventory(this.playerData.inventory);
+                return true;
+            }
+        }
+        
+        return false; // Inventory full
+    }
+    
+    removeItemFromInventory(itemName, count = 1) {
+        for (let i = 0; i < this.playerData.inventory.length; i++) {
+            const item = this.playerData.inventory[i];
+            if (item && item.name === itemName) {
+                if (item.count <= count) {
+                    this.playerData.inventory[i] = null;
+                } else {
+                    item.count -= count;
+                }
+                this.hud.updateInventory(this.playerData.inventory);
+                return true;
+            }
         }
         return false;
     }
     
-    removeItemFromInventory(slot) {
-        if (this.playerData.inventory[slot]) {
-            const item = this.playerData.inventory[slot];
-            this.playerData.inventory[slot] = null;
-            this.hud.updateInventory(this.playerData.inventory);
-            return item;
+    hasItem(itemName, count = 1) {
+        let totalCount = 0;
+        for (const item of this.playerData.inventory) {
+            if (item && item.name === itemName) {
+                totalCount += item.count || 1;
+            }
         }
-        return null;
+        return totalCount >= count;
     }
     
     takeDamage(amount) {
@@ -594,6 +673,69 @@ class Game {
             return true;
         }
         return false;
+    }
+
+    handlePlayerInteractions() {
+        // Handle item collection
+        if (this.controls.interact) {
+            this.collectNearbyItems();
+        }
+        
+        // Handle crafting
+        if (this.controls.craft) {
+            this.crafting.show();
+        }
+        
+        // Handle map
+        if (this.controls.map) {
+            this.map.show();
+        }
+    }
+    
+    collectNearbyItems() {
+        // Simple item collection system
+        const playerPos = this.player.getPosition();
+        const collectionRadius = 3;
+        
+        // Check for items in the world
+        if (this.currentPlanet && this.currentPlanet.objects) {
+            this.currentPlanet.objects.forEach((object, id) => {
+                if (object.item) {
+                    const distance = Math.sqrt(
+                        Math.pow(object.position.x - playerPos.x, 2) +
+                        Math.pow(object.position.y - playerPos.y, 2) +
+                        Math.pow(object.position.z - playerPos.z, 2)
+                    );
+                    
+                    if (distance < collectionRadius) {
+                        if (this.addItemToInventory(object.item)) {
+                            // Remove from world
+                            this.currentPlanet.objects.delete(id);
+                            this.hud.showMessage(`Collected ${object.item.name}!`);
+                        } else {
+                            this.hud.showMessage('Inventory is full!');
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    connectSystems() {
+        // Connect weather and atmosphere systems
+        if (this.currentPlanet && this.currentPlanet.atmosphere) {
+            this.currentPlanet.atmosphere.setWeatherSystem(this.weather);
+        }
+        
+        // Connect physics system to player
+        this.physics.addObject(this.player, {
+            affectedByGravity: true,
+            radius: 0.5,
+            mass: 70
+        });
+        
+        // Connect orbital mechanics to solar system
+        this.orbitalMechanics.setTimeScale(1.0);
     }
 }
 
