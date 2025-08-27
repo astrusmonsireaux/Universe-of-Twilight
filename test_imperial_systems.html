@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veauxalia - Imperial Systems Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #4a90e2;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .test-section h2 {
+            color: #4a90e2;
+            margin-top: 0;
+        }
+        .test-button {
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            border: none;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: bold;
+        }
+        .test-button:hover {
+            background: linear-gradient(135deg, #357abd, #2c5aa0);
+        }
+        .output {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #4a90e2;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Veauxalia - Imperial Systems Test</h1>
+        
+        <div class="test-section">
+            <h2>Political System Test</h2>
+            <button class="test-button" onclick="testPoliticalSystem()">Test Political System</button>
+            <button class="test-button" onclick="testElection()">Simulate Election</button>
+            <button class="test-button" onclick="testSenate()">Simulate Senate Session</button>
+            <button class="test-button" onclick="testDecree()">Generate Imperial Decree</button>
+            <div id="political-output" class="output"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Cultural System Test</h2>
+            <button class="test-button" onclick="testCulturalSystem()">Test Cultural System</button>
+            <button class="test-button" onclick="testTranslation()">Test Gaulsais Translation</button>
+            <button class="test-button" onclick="testPoem()">Generate Poem</button>
+            <button class="test-button" onclick="testArtwork()">Generate Artwork</button>
+            <div id="cultural-output" class="output"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Language System Test</h2>
+            <button class="test-button" onclick="testLanguageSystem()">Test Language System</button>
+            <button class="test-button" onclick="testVeauxaliaTime()">Convert to Veauxalia Time</button>
+            <div id="language-output" class="output"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Imperial UI Test</h2>
+            <button class="test-button" onclick="testImperialUI()">Test Imperial UI</button>
+            <button class="test-button" onclick="showImperialMessage()">Show Imperial Message</button>
+            <div id="ui-output" class="output"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/utils/Constants.js"></script>
+    <script src="js/utils/MathUtils.js"></script>
+    <script src="js/utils/LanguageSystem.js"></script>
+    <script src="js/systems/PoliticalSystem.js"></script>
+    <script src="js/systems/CulturalSystem.js"></script>
+    <script src="js/ui/ImperialUI.js"></script>
+    
+    <script>
+        let politicalSystem, culturalSystem, languageSystem, imperialUI;
+        
+        // Initialize systems
+        function initSystems() {
+            politicalSystem = new PoliticalSystem();
+            culturalSystem = new CulturalSystem();
+            languageSystem = new LanguageSystem();
+            imperialUI = new ImperialUI();
+            imperialUI.setSystems(politicalSystem, culturalSystem, languageSystem);
+        }
+        
+        // Test Political System
+        function testPoliticalSystem() {
+            if (!politicalSystem) initSystems();
+            
+            const status = politicalSystem.getEmpireStatus();
+            const policies = politicalSystem.getCurrentPolicies();
+            const events = politicalSystem.getRecentEvents();
+            const rights = politicalSystem.getCitizenRights();
+            
+            const output = `Political System Test Results:
+            
+Empire Status:
+- Name: ${status.name}
+- Stability: ${status.stability.toFixed(1)}%
+- Democracy: ${status.democracy.toFixed(1)}%
+- Technology: ${status.technology.toFixed(1)}%
+- Prosperity: ${status.prosperity.toFixed(1)}%
+- Emperor Approval: ${status.emperorApproval.toFixed(1)}%
+
+Current Policies (${policies.length}):
+${policies.map(p => `- ${p.name}: ${p.description} (Support: ${p.support}%)`).join('\n')}
+
+Recent Events (${events.length}):
+${events.map(e => `- ${e.title} (Year ${e.year}): ${e.description}`).join('\n')}
+
+Citizen Rights:
+- Fundamental: ${rights.fundamental.length} rights
+- Political: ${rights.political.length} rights
+- Social: ${rights.social.length} rights`;
+            
+            document.getElementById('political-output').textContent = output;
+        }
+        
+        // Test Election
+        function testElection() {
+            if (!politicalSystem) initSystems();
+            
+            const election = politicalSystem.simulateElection();
+            
+            const output = `Election Simulation Results:
+            
+Year: ${election.year} AE
+Total Votes: ${election.totalVotes.toLocaleString()}
+
+Results:
+${election.results.map(r => `- ${r.name} (${r.party}): ${r.votes.toLocaleString()} votes (${r.percentage}%)`).join('\n')}
+
+Winner: ${election.winner.name} with ${election.winner.votes.toLocaleString()} votes`;
+            
+            document.getElementById('political-output').textContent = output;
+        }
+        
+        // Test Senate Session
+        function testSenate() {
+            if (!politicalSystem) initSystems();
+            
+            const session = politicalSystem.simulateSenateSession();
+            
+            const output = `Senate Session Simulation:
+            
+Session: ${session.session}
+Attendance: ${session.attendance}%
+Quorum: ${session.quorum}
+
+Current Bills:
+${session.bills.map(b => `- ${b.name}: ${b.description}
+  Sponsor: ${b.sponsor} | Support: ${b.support}% | Status: ${b.status}`).join('\n\n')}`;
+            
+            document.getElementById('political-output').textContent = output;
+        }
+        
+        // Test Decree
+        function testDecree() {
+            if (!politicalSystem) initSystems();
+            
+            const decree = politicalSystem.generateImperialDecree();
+            
+            const output = `Imperial Decree Generated:
+            
+Title: ${decree.title}
+Content: ${decree.content}
+Category: ${decree.category}
+Emperor: ${decree.emperor}
+Year: ${decree.year} AE`;
+            
+            document.getElementById('political-output').textContent = output;
+        }
+        
+        // Test Cultural System
+        function testCulturalSystem() {
+            if (!culturalSystem) initSystems();
+            
+            const traditions = culturalSystem.getTraditions();
+            const philosophy = culturalSystem.getPhilosophy();
+            const festivals = culturalSystem.festivals;
+            const currentFestival = culturalSystem.getCurrentFestival();
+            
+            const output = `Cultural System Test Results:
+            
+Traditions:
+- Ceremonies: ${traditions.ceremonies.length}
+- Customs: ${traditions.customs.length}
+- Rituals: ${traditions.rituals.length}
+
+Philosophy:
+- Schools: ${philosophy.schools.length}
+- Principles: ${philosophy.principles.length}
+
+Festivals:
+- Total: ${festivals.length}
+- Current: ${currentFestival ? currentFestival.name : 'None'}
+
+Arts:
+- Visual Styles: ${culturalSystem.arts.visual.styles.length}
+- Musical Styles: ${culturalSystem.arts.musical.styles.length}
+- Literary Genres: ${culturalSystem.arts.literary.genres.length}`;
+            
+            document.getElementById('cultural-output').textContent = output;
+        }
+        
+        // Test Translation
+        function testTranslation() {
+            if (!culturalSystem) initSystems();
+            
+            const testText = "Welcome to the United Empire of Gauletria. We value truth, justice, and scientific progress.";
+            const translated = culturalSystem.translateToGaulsais(testText);
+            const name = culturalSystem.generateGaulsaisName('location');
+            
+            const output = `Translation Test:
+            
+Original: ${testText}
+Translated: ${translated}
+Generated Name: ${name}`;
+            
+            document.getElementById('cultural-output').textContent = output;
+        }
+        
+        // Test Poem
+        function testPoem() {
+            if (!culturalSystem) initSystems();
+            
+            const themes = ['truth', 'science', 'environment', 'unity'];
+            const poems = themes.map(theme => `${theme.toUpperCase()}: ${culturalSystem.generatePoem(theme)}`);
+            
+            const output = `Generated Poems:
+            
+${poems.join('\n\n')}`;
+            
+            document.getElementById('cultural-output').textContent = output;
+        }
+        
+        // Test Artwork
+        function testArtwork() {
+            if (!culturalSystem) initSystems();
+            
+            const styles = ['scientific', 'environmental', 'unity'];
+            const artworks = styles.map(style => {
+                const art = culturalSystem.generateArtwork(style);
+                return `${style.toUpperCase()}:
+- Name: ${art.name}
+- Description: ${art.description}
+- Medium: ${art.medium}
+- Theme: ${art.theme}`;
+            });
+            
+            const output = `Generated Artworks:
+            
+${artworks.join('\n\n')}`;
+            
+            document.getElementById('cultural-output').textContent = output;
+        }
+        
+        // Test Language System
+        function testLanguageSystem() {
+            if (!languageSystem) initSystems();
+            
+            const currentLang = languageSystem.getCurrentLanguage();
+            const available = languageSystem.getAvailableLanguages();
+            const greeting = languageSystem.translate('welcome', 'messages');
+            const imperialGreeting = languageSystem.generateImperialGreeting();
+            
+            const output = `Language System Test:
+            
+Current Language: ${currentLang}
+Available Languages: ${available.join(', ')}
+
+Translations:
+- Welcome: ${greeting}
+- Imperial Greeting: ${imperialGreeting}
+
+Gaulsais Vocabulary Categories:
+- Greetings: ${Object.keys(languageSystem.translations.greetings.gaulsais).length} words
+- Numbers: ${Object.keys(languageSystem.translations.numbers.gaulsais).length} words
+- Science: ${Object.keys(languageSystem.translations.science.gaulsais).length} words
+- Society: ${Object.keys(languageSystem.translations.society.gaulsais).length} words`;
+            
+            document.getElementById('language-output').textContent = output;
+        }
+        
+        // Test Veauxalia Time
+        function testVeauxaliaTime() {
+            if (!languageSystem) initSystems();
+            
+            const now = Date.now() / 1000; // Current time in seconds
+            const veauxaliaTime = languageSystem.convertToVeauxaliaTime(now);
+            
+            const output = `Veauxalia Time Conversion:
+            
+Earth Time: ${new Date().toISOString()}
+Veauxalia Time: ${veauxaliaTime.formatted}
+
+Details:
+- Years: ${veauxaliaTime.years}
+- Months: ${veauxaliaTime.months} (${veauxaliaTime.monthName})
+- Days: ${veauxaliaTime.days} (${veauxaliaTime.dayName})
+- Hours: ${veauxaliaTime.hours}`;
+            
+            document.getElementById('language-output').textContent = output;
+        }
+        
+        // Test Imperial UI
+        function testImperialUI() {
+            if (!imperialUI) initSystems();
+            
+            const output = `Imperial UI Test:
+            
+Overlays Available: ${imperialUI.overlays.size}
+Current View: ${imperialUI.currentView}
+
+Systems Connected:
+- Political: ${imperialUI.politicalSystem ? 'Yes' : 'No'}
+- Cultural: ${imperialUI.culturalSystem ? 'Yes' : 'No'}
+- Language: ${imperialUI.languageSystem ? 'Yes' : 'No'}
+
+Available Overlays:
+- imperial-status
+- political
+- cultural
+- citizen-rights
+- festival`;
+            
+            document.getElementById('ui-output').textContent = output;
+        }
+        
+        // Show Imperial Message
+        function showImperialMessage() {
+            if (!imperialUI) initSystems();
+            
+            imperialUI.showImperialMessage('This is a test message from the Imperial UI system!', 'info');
+            
+            document.getElementById('ui-output').textContent = 'Imperial message displayed! Check the top-right corner of the screen.';
+        }
+        
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            console.log('Veauxalia Imperial Systems Test Page Loaded');
+            initSystems();
+        });
+    </script>
+</body>
+</html>

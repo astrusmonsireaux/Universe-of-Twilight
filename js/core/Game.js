@@ -29,6 +29,11 @@ class Game {
         // Language system
         this.languageSystem = null;
         
+        // Political and Cultural systems
+        this.politicalSystem = null;
+        this.culturalSystem = null;
+        this.imperialUI = null;
+        
         // Game state
         this.gameMode = 'survival'; // survival, creative, adventure, sandbox
         this.currentLocation = 'Chimera';
@@ -64,6 +69,12 @@ class Game {
             this.languageSystem = new LanguageSystem();
             this.languageSystem.setLanguage(this.settings.language);
             
+            // Initialize political and cultural systems
+            this.politicalSystem = new PoliticalSystem();
+            this.culturalSystem = new CulturalSystem();
+            this.imperialUI = new ImperialUI();
+            this.imperialUI.setSystems(this.politicalSystem, this.culturalSystem, this.languageSystem);
+            
             // Initialize core systems
             this.scene = new Scene();
             this.camera = new Camera();
@@ -97,8 +108,18 @@ class Game {
             this.crafting.init();
             this.map.init();
             
-            // Show welcome message
-            this.showWelcomeMessage();
+                    // Show welcome message
+        this.showWelcomeMessage();
+        
+        // Show imperial decree
+        setTimeout(() => {
+            this.imperialUI.showImperialDecree();
+        }, 2000);
+        
+        // Show cultural event
+        setTimeout(() => {
+            this.imperialUI.showCulturalEvent();
+        }, 4000);
             
             // Hide loading screen and show game
             this.hideLoadingScreen();
@@ -213,6 +234,11 @@ class Game {
         
         // Update orbital mechanics
         this.orbitalMechanics.update(scaledDeltaTime);
+        
+        // Update political and cultural systems
+        this.politicalSystem.update(scaledDeltaTime);
+        this.culturalSystem.update(scaledDeltaTime);
+        this.imperialUI.update(scaledDeltaTime);
         
         // Update UI
         this.hud.update(deltaTime); // UI updates at normal speed
@@ -445,6 +471,21 @@ class Game {
                 break;
             case 'KeyM':
                 this.map.show();
+                break;
+            case 'KeyI':
+                this.imperialUI.showOverlay('imperial-status');
+                break;
+            case 'KeyP':
+                this.imperialUI.showOverlay('political');
+                break;
+            case 'KeyC':
+                this.imperialUI.showOverlay('cultural');
+                break;
+            case 'KeyR':
+                this.imperialUI.showOverlay('citizen-rights');
+                break;
+            case 'KeyF':
+                this.imperialUI.showOverlay('festival');
                 break;
             case 'Escape':
                 this.pause();

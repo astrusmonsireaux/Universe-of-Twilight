@@ -58,6 +58,33 @@ Veauxalia is an immersive 3D game that combines elements of Universe Sandbox, Wo
 - **T** - Telepathy ability
 - **Y** - Time perception ability
 - **V** - Enhanced vision toggle
+- **I** - Imperial Status
+- **P** - Political System
+- **C** - Cultural System
+- **R** - Citizen Rights
+- **F** - Festival Info
+
+### Imperial Systems
+1. **Political System**
+   - Imperial Elastic Democracy simulation
+   - Emperor approval ratings and policies
+   - Senate sessions and legislative processes
+   - Citizen rights and democratic participation
+   - Historical events and achievements
+
+2. **Cultural System**
+   - Gaulsais language and traditions
+   - Philosophical schools and principles
+   - Arts, music, and literature
+   - Festivals and ceremonies
+   - Cultural events and rituals
+
+3. **Imperial UI**
+   - Real-time empire status monitoring
+   - Political information and statistics
+   - Cultural content and language tools
+   - Festival schedules and information
+   - Imperial decrees and announcements
 
 ### Homo Kaylex Abilities
 1. **Photosynthesis** (Always Active)
@@ -117,6 +144,13 @@ Veauxalia is an immersive 3D game that combines elements of Universe Sandbox, Wo
 ### World Generation
 - **Perlin Noise** - Natural-looking terrain generation
 - **Multiple Octaves** - Detailed height variations
+
+### Imperial Systems
+- **Political Simulation** - Real-time empire management and democratic processes
+- **Cultural Integration** - Gaulsais language, traditions, and philosophical systems
+- **Dynamic Events** - Random political and cultural events generation
+- **Time Conversion** - Veauxalia calendar system with 20 months and unique timekeeping
+- **Language Processing** - Advanced translation and name generation systems
 - **Biome Mapping** - Climate-based environment distribution
 - **Chunk Loading** - Efficient world rendering
 
