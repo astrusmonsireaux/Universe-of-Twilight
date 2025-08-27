@@ -1,380 +1,393 @@
-// Crafting system for Veauxalia
+// Enhanced Crafting System for Veauxalia
 class Crafting {
     constructor() {
-        this.isVisible = false;
         this.recipes = this.initializeRecipes();
+        this.currentCategory = 'all';
+        this.categories = ['all', 'tools', 'structures', 'consumables', 'special', 'technology'];
+        this.init();
     }
     
     init() {
-        console.log('Crafting system initialized');
+        this.setupEventListeners();
+        this.populateCraftingGrid();
+        console.log('Enhanced crafting system initialized');
     }
     
     initializeRecipes() {
         return {
             // Basic Tools
-            'wooden_pickaxe': {
-                name: 'Wooden Pickaxe',
-                ingredients: [
-                    { item: 'wood', count: 3 },
-                    { item: 'stick', count: 2 }
-                ],
-                result: { item: 'wooden_pickaxe', count: 1 },
-                category: 'tools',
-                description: 'Basic tool for mining stone and ores'
+            wooden_pickaxe: {
+                name: "Wooden Pickaxe",
+                category: "tools",
+                ingredients: { wood: 3, stick: 2 },
+                result: { item: "wooden_pickaxe", count: 1 },
+                description: "Basic mining tool for extracting resources",
+                lore: "Essential tool for resource gathering in the Veauxalia system"
             },
-            'stone_pickaxe': {
-                name: 'Stone Pickaxe',
-                ingredients: [
-                    { item: 'stone', count: 3 },
-                    { item: 'stick', count: 2 }
-                ],
-                result: { item: 'stone_pickaxe', count: 1 },
-                category: 'tools',
-                description: 'Improved mining tool'
+            
+            stone_pickaxe: {
+                name: "Stone Pickaxe",
+                category: "tools",
+                ingredients: { stone: 3, stick: 2 },
+                result: { item: "stone_pickaxe", count: 1 },
+                description: "Improved mining tool with better durability",
+                lore: "Advanced mining technology from the United Empire"
             },
-            'iron_pickaxe': {
-                name: 'Iron Pickaxe',
-                ingredients: [
-                    { item: 'iron_ore', count: 3 },
-                    { item: 'stick', count: 2 }
-                ],
-                result: { item: 'iron_pickaxe', count: 1 },
-                category: 'tools',
-                description: 'Advanced mining tool'
+            
+            iron_pickaxe: {
+                name: "Iron Pickaxe",
+                category: "tools",
+                ingredients: { iron_ore: 3, stick: 2 },
+                result: { item: "iron_pickaxe", count: 1 },
+                description: "High-quality mining tool for advanced extraction",
+                lore: "Imperial-grade mining equipment"
             },
-            'wooden_axe': {
-                name: 'Wooden Axe',
-                ingredients: [
-                    { item: 'wood', count: 3 },
-                    { item: 'stick', count: 2 }
-                ],
-                result: { item: 'wooden_axe', count: 1 },
-                category: 'tools',
-                description: 'Tool for chopping wood'
-            },
-            'stone_axe': {
-                name: 'Stone Axe',
-                ingredients: [
-                    { item: 'stone', count: 3 },
-                    { item: 'stick', count: 2 }
-                ],
-                result: { item: 'stone_axe', count: 1 },
-                category: 'tools',
-                description: 'Improved wood cutting tool'
+            
+            wooden_axe: {
+                name: "Wooden Axe",
+                category: "tools",
+                ingredients: { wood: 3, stick: 2 },
+                result: { item: "wooden_axe", count: 1 },
+                description: "Basic wood cutting tool",
+                lore: "Traditional tool for harvesting organic materials"
             },
             
             // Structures
-            'campfire': {
-                name: 'Campfire',
-                ingredients: [
-                    { item: 'stone', count: 8 },
-                    { item: 'wood', count: 4 }
-                ],
-                result: { item: 'campfire', count: 1 },
-                category: 'structures',
-                description: 'Provides light and warmth'
+            campfire: {
+                name: "Campfire",
+                category: "structures",
+                ingredients: { rock: 8, wood: 4 },
+                result: { item: "campfire", count: 1 },
+                description: "Provides light, warmth, and cooking capability",
+                lore: "Ancient technology still useful in modern exploration"
             },
-            'shelter': {
-                name: 'Basic Shelter',
-                ingredients: [
-                    { item: 'wood', count: 10 },
-                    { item: 'stone', count: 5 }
-                ],
-                result: { item: 'shelter', count: 1 },
-                category: 'structures',
-                description: 'Protection from weather'
+            
+            shelter: {
+                name: "Basic Shelter",
+                category: "structures",
+                ingredients: { wood: 10, stone: 5 },
+                result: { item: "shelter", count: 1 },
+                description: "Protection from weather and environmental hazards",
+                lore: "Standard survival structure used by Empire explorers"
             },
-            'advanced_shelter': {
-                name: 'Advanced Shelter',
-                ingredients: [
-                    { item: 'wood', count: 15 },
-                    { item: 'stone', count: 10 },
-                    { item: 'iron_ore', count: 3 }
-                ],
-                result: { item: 'advanced_shelter', count: 1 },
-                category: 'structures',
-                description: 'Enhanced protection and comfort'
+            
+            advanced_shelter: {
+                name: "Advanced Shelter",
+                category: "structures",
+                ingredients: { shelter: 1, iron_ore: 5, crystal: 2 },
+                result: { item: "advanced_shelter", count: 1 },
+                description: "Enhanced protection with energy systems",
+                lore: "Modern Imperial technology for long-term habitation"
             },
             
             // Consumables
-            'medicine': {
-                name: 'Basic Medicine',
-                ingredients: [
-                    { item: 'herb', count: 3 },
-                    { item: 'water', count: 1 }
-                ],
-                result: { item: 'medicine', count: 1 },
-                category: 'consumables',
-                description: 'Restores health'
-            },
-            'energy_potion': {
-                name: 'Energy Potion',
-                ingredients: [
-                    { item: 'herb', count: 2 },
-                    { item: 'fruit', count: 2 },
-                    { item: 'water', count: 1 }
-                ],
-                result: { item: 'energy_potion', count: 1 },
-                category: 'consumables',
-                description: 'Restores energy'
-            },
-            'enhanced_medicine': {
-                name: 'Enhanced Medicine',
-                ingredients: [
-                    { item: 'herb', count: 5 },
-                    { item: 'rare_herb', count: 1 },
-                    { item: 'water', count: 2 }
-                ],
-                result: { item: 'enhanced_medicine', count: 1 },
-                category: 'consumables',
-                description: 'Significantly restores health'
+            medicine: {
+                name: "Basic Medicine",
+                category: "consumables",
+                ingredients: { herb: 3, water: 1 },
+                result: { item: "medicine", count: 1 },
+                description: "Restores health and treats minor injuries",
+                lore: "Traditional healing knowledge preserved by Homo Kaylex"
             },
             
-            // Homo Kaylex Special Items
-            'photosynthesis_enhancer': {
-                name: 'Photosynthesis Enhancer',
-                ingredients: [
-                    { item: 'herb', count: 4 },
-                    { item: 'crystal', count: 1 },
-                    { item: 'water', count: 2 }
-                ],
-                result: { item: 'photosynthesis_enhancer', count: 1 },
-                category: 'special',
-                description: 'Enhances photosynthetic efficiency'
+            enhanced_medicine: {
+                name: "Enhanced Medicine",
+                category: "consumables",
+                ingredients: { medicine: 1, rare_herb: 2, crystal: 1 },
+                result: { item: "enhanced_medicine", count: 1 },
+                description: "Advanced healing with rapid recovery",
+                lore: "Imperial medical technology enhanced with natural compounds"
             },
-            'telepathy_crystal': {
-                name: 'Telepathy Crystal',
-                ingredients: [
-                    { item: 'crystal', count: 3 },
-                    { item: 'rare_crystal', count: 1 },
-                    { item: 'herb', count: 2 }
-                ],
-                result: { item: 'telepathy_crystal', count: 1 },
-                category: 'special',
-                description: 'Unlocks telepathy ability'
+            
+            energy_potion: {
+                name: "Energy Potion",
+                category: "consumables",
+                ingredients: { herb: 2, rare_herb: 1, water: 1 },
+                result: { item: "energy_potion", count: 1 },
+                description: "Boosts energy and enhances photosynthesis",
+                lore: "Specially formulated for Homo Kaylex physiology"
             },
-            'time_crystal': {
-                name: 'Time Crystal',
-                ingredients: [
-                    { item: 'rare_crystal', count: 2 },
-                    { item: 'crystal', count: 5 },
-                    { item: 'herb', count: 3 }
-                ],
-                result: { item: 'time_crystal', count: 1 },
-                category: 'special',
-                description: 'Unlocks time perception ability'
+            
+            // Special Items
+            photosynthesis_enhancer: {
+                name: "Photosynthesis Enhancer",
+                category: "special",
+                ingredients: { rare_crystal: 2, herb: 5, water: 2 },
+                result: { item: "photosynthesis_enhancer", count: 1 },
+                description: "Temporarily enhances photosynthetic efficiency",
+                lore: "Advanced biotechnology developed by Imperial scientists"
+            },
+            
+            telepathy_crystal: {
+                name: "Telepathy Crystal",
+                category: "special",
+                ingredients: { rare_crystal: 3, crystal: 5, herb: 10 },
+                result: { item: "telepathy_crystal", count: 1 },
+                description: "Unlocks telepathic abilities",
+                lore: "Ancient technology rediscovered by the United Empire"
+            },
+            
+            time_crystal: {
+                name: "Time Crystal",
+                category: "special",
+                ingredients: { rare_crystal: 5, telepathy_crystal: 1, crystal: 10 },
+                result: { item: "time_crystal", count: 1 },
+                description: "Unlocks time perception abilities",
+                lore: "Mystical artifact of unknown origin, studied by Imperial researchers"
+            },
+            
+            // Technology
+            energy_core: {
+                name: "Energy Core",
+                category: "technology",
+                ingredients: { iron_ore: 8, crystal: 4, rare_crystal: 2 },
+                result: { item: "energy_core", count: 1 },
+                description: "Advanced power source for technological devices",
+                lore: "Core component of Imperial technology systems"
+            },
+            
+            communication_device: {
+                name: "Communication Device",
+                category: "technology",
+                ingredients: { energy_core: 1, crystal: 3, iron_ore: 5 },
+                result: { item: "communication_device", count: 1 },
+                description: "Long-range communication system",
+                lore: "Standard Imperial communication technology"
+            },
+            
+            environmental_scanner: {
+                name: "Environmental Scanner",
+                category: "technology",
+                ingredients: { energy_core: 1, crystal: 2, rare_crystal: 1 },
+                result: { item: "environmental_scanner", count: 1 },
+                description: "Analyzes environmental conditions and resources",
+                lore: "Essential tool for Imperial exploration missions"
+            },
+            
+            // Advanced Structures
+            research_station: {
+                name: "Research Station",
+                category: "structures",
+                ingredients: { advanced_shelter: 1, energy_core: 2, environmental_scanner: 1 },
+                result: { item: "research_station", count: 1 },
+                description: "Advanced facility for scientific research",
+                lore: "Mobile research facility used by Imperial scientists"
+            },
+            
+            power_generator: {
+                name: "Power Generator",
+                category: "technology",
+                ingredients: { energy_core: 3, iron_ore: 10, crystal: 5 },
+                result: { item: "power_generator", count: 1 },
+                description: "Generates power for advanced structures",
+                lore: "Industrial power generation technology"
             }
         };
     }
     
-    show() {
-        document.getElementById('crafting-overlay').classList.remove('hidden');
-        this.isVisible = true;
-        this.populateCraftingGrid();
+    setupEventListeners() {
+        // Category tabs
+        this.categories.forEach(category => {
+            const tab = document.createElement('div');
+            tab.className = 'category-tab';
+            tab.textContent = this.getCategoryDisplayName(category);
+            tab.addEventListener('click', () => this.selectCategory(category));
+            
+            const categoryContainer = document.querySelector('.crafting-categories');
+            if (categoryContainer) {
+                categoryContainer.appendChild(tab);
+            }
+        });
+        
+        // Back button
+        const backBtn = document.getElementById('crafting-back');
+        if (backBtn) {
+            backBtn.addEventListener('click', () => this.hide());
+        }
     }
     
-    hide() {
-        document.getElementById('crafting-overlay').classList.add('hidden');
-        this.isVisible = false;
+    getCategoryDisplayName(category) {
+        const names = {
+            'all': 'All Items',
+            'tools': 'Tools',
+            'structures': 'Structures',
+            'consumables': 'Consumables',
+            'special': 'Special Items',
+            'technology': 'Technology'
+        };
+        return names[category] || category;
+    }
+    
+    selectCategory(category) {
+        this.currentCategory = category;
+        
+        // Update active tab
+        document.querySelectorAll('.category-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        const activeTab = document.querySelector(`.category-tab:nth-child(${this.categories.indexOf(category) + 1})`);
+        if (activeTab) {
+            activeTab.classList.add('active');
+        }
+        
+        this.populateCraftingGrid();
     }
     
     populateCraftingGrid() {
         const grid = document.getElementById('crafting-grid');
+        if (!grid) return;
+        
         grid.innerHTML = '';
         
-        // Group recipes by category
-        const categories = {};
-        Object.keys(this.recipes).forEach(recipeId => {
-            const recipe = this.recipes[recipeId];
-            if (!categories[recipe.category]) {
-                categories[recipe.category] = [];
-            }
-            categories[recipe.category].push({ id: recipeId, ...recipe });
+        // Filter recipes by category
+        const filteredRecipes = Object.entries(this.recipes).filter(([key, recipe]) => {
+            return this.currentCategory === 'all' || recipe.category === this.currentCategory;
         });
         
-        // Create category tabs
-        const categoryTabs = document.createElement('div');
-        categoryTabs.className = 'crafting-categories';
-        categoryTabs.innerHTML = Object.keys(categories).map(category => 
-            `<button class="category-tab" data-category="${category}">${category.charAt(0).toUpperCase() + category.slice(1)}</button>`
-        ).join('');
-        
-        grid.appendChild(categoryTabs);
-        
-        // Create recipe containers for each category
-        Object.keys(categories).forEach(category => {
-            const categoryContainer = document.createElement('div');
-            categoryContainer.className = 'category-container';
-            categoryContainer.dataset.category = category;
-            categoryContainer.style.display = category === 'tools' ? 'grid' : 'none';
-            
-            categories[category].forEach(recipe => {
-                const canCraft = this.canCraftRecipe(recipe);
-                
-                const recipeElement = document.createElement('div');
-                recipeElement.className = 'crafting-item';
-                recipeElement.style.cssText = `
-                    background: ${canCraft ? 'rgba(0, 255, 0, 0.1)' : 'rgba(255, 0, 0, 0.1)'};
-                    border: 1px solid ${canCraft ? '#00ff00' : '#ff0000'};
-                    border-radius: 8px;
-                    padding: 15px;
-                    cursor: ${canCraft ? 'pointer' : 'not-allowed'};
-                    transition: all 0.2s ease;
-                    margin: 5px;
-                `;
-            
-            recipeElement.innerHTML = `
-                <h4 style="color: ${canCraft ? '#00ff00' : '#ff0000'}; margin: 0 0 5px 0;">${recipe.name}</h4>
-                <div style="font-size: 11px; color: #aaa; font-style: italic; margin-bottom: 8px;">
-                    ${recipe.description}
-                </div>
-                <div style="font-size: 10px; color: #888; margin-bottom: 5px;">
-                    <strong>Ingredients:</strong> ${recipe.ingredients.map(ing => `${ing.count}x ${ing.item}`).join(', ')}
-                </div>
-                <div style="font-size: 10px; color: #00ff00; font-weight: bold;">
-                    Creates: ${recipe.result.count}x ${recipe.result.item}
-                </div>
-            `;
-            
-            if (canCraft) {
-                recipeElement.addEventListener('click', () => {
-                    this.craftItem(recipe.id);
-                });
-                
-                recipeElement.addEventListener('mouseenter', () => {
-                    recipeElement.style.transform = 'scale(1.05)';
-                });
-                
-                recipeElement.addEventListener('mouseleave', () => {
-                    recipeElement.style.transform = 'scale(1)';
-                });
-            }
-            
-            categoryContainer.appendChild(recipeElement);
-        });
-        
-        grid.appendChild(categoryContainer);
-    });
-    
-    // Add category tab functionality
-    this.setupCategoryTabs();
-}
-
-setupCategoryTabs() {
-    const tabs = document.querySelectorAll('.category-tab');
-    const containers = document.querySelectorAll('.category-container');
-    
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const category = tab.dataset.category;
-            
-            // Update active tab
-            tabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            
-            // Show selected category
-            containers.forEach(container => {
-                container.style.display = container.dataset.category === category ? 'grid' : 'none';
+        // Group by category if showing all
+        if (this.currentCategory === 'all') {
+            this.categories.slice(1).forEach(category => {
+                const categoryRecipes = filteredRecipes.filter(([key, recipe]) => recipe.category === category);
+                if (categoryRecipes.length > 0) {
+                    this.addCategorySection(grid, category, categoryRecipes);
+                }
             });
-        });
-    });
-    
-    // Set first tab as active
-    if (tabs.length > 0) {
-        tabs[0].classList.add('active');
+        } else {
+            // Show all recipes in current category
+            filteredRecipes.forEach(([key, recipe]) => {
+                this.addRecipeItem(grid, key, recipe);
+            });
+        }
     }
-}
+    
+    addCategorySection(container, category, recipes) {
+        const section = document.createElement('div');
+        section.className = 'category-section';
+        section.innerHTML = `
+            <h3 class="category-title">${this.getCategoryDisplayName(category)}</h3>
+            <div class="category-container"></div>
+        `;
+        
+        const categoryContainer = section.querySelector('.category-container');
+        recipes.forEach(([key, recipe]) => {
+            this.addRecipeItem(categoryContainer, key, recipe);
+        });
+        
+        container.appendChild(section);
+    }
+    
+    addRecipeItem(container, key, recipe) {
+        const item = document.createElement('div');
+        item.className = 'crafting-item';
+        
+        const canCraft = this.canCraftRecipe(recipe);
+        if (canCraft) {
+            item.classList.add('craftable');
+        }
+        
+        item.innerHTML = `
+            <h4>${recipe.name}</h4>
+            <div class="description">${recipe.description}</div>
+            <div class="lore">${recipe.lore}</div>
+            <div class="ingredients">
+                <strong>Ingredients:</strong><br>
+                ${this.formatIngredients(recipe.ingredients)}
+            </div>
+            <div class="result">
+                <strong>Result:</strong> ${recipe.result.count}x ${recipe.result.item}
+            </div>
+        `;
+        
+        item.addEventListener('click', () => this.craftItem(key, recipe));
+        container.appendChild(item);
+    }
+    
+    formatIngredients(ingredients) {
+        return Object.entries(ingredients)
+            .map(([item, count]) => `${count}x ${item.replace('_', ' ')}`)
+            .join(', ');
+    }
     
     canCraftRecipe(recipe) {
         if (!window.game || !window.game.playerData) return false;
         
         const inventory = window.game.playerData.inventory;
+        const itemCounts = {};
         
-        // Check if player has all required ingredients
-        for (const ingredient of recipe.ingredients) {
-            let hasEnough = false;
-            let totalCount = 0;
-            
-            for (const item of inventory) {
-                if (item && item.name === ingredient.item) {
-                    totalCount += item.count || 1;
-                }
+        // Count items in inventory
+        inventory.forEach(item => {
+            if (item) {
+                itemCounts[item.name] = (itemCounts[item.name] || 0) + (item.count || 1);
             }
-            
-            if (totalCount >= ingredient.count) {
-                hasEnough = true;
+        });
+        
+        // Check if we have all required ingredients
+        for (const [ingredient, requiredCount] of Object.entries(recipe.ingredients)) {
+            const availableCount = itemCounts[ingredient] || 0;
+            if (availableCount < requiredCount) {
+                return false;
             }
-            
-            if (!hasEnough) return false;
         }
         
         return true;
     }
     
-    craftItem(recipeId) {
-        const recipe = this.recipes[recipeId];
-        if (!recipe || !this.canCraftRecipe(recipe)) {
-            this.showMessage('Cannot craft this item - missing ingredients!');
+    showMessage(message) {
+        if (window.game && window.game.hud) {
+            window.game.hud.showMessage(message);
+        }
+    }
+    
+    showTranslatedMessage(key, params = {}) {
+        if (window.game && window.game.hud) {
+            window.game.hud.showTranslatedMessage(key, params);
+        }
+    }
+    
+    craftItem(recipeKey, recipe) {
+        if (!this.canCraftRecipe(recipe)) {
+            this.showTranslatedMessage('insufficient_materials');
             return;
         }
         
         // Remove ingredients from inventory
-        for (const ingredient of recipe.ingredients) {
-            let remainingToRemove = ingredient.count;
-            
-            for (let i = 0; i < window.game.playerData.inventory.length && remainingToRemove > 0; i++) {
-                const item = window.game.playerData.inventory[i];
-                if (item && item.name === ingredient.item) {
-                    const itemCount = item.count || 1;
-                    const toRemove = Math.min(remainingToRemove, itemCount);
-                    
-                    if (toRemove >= itemCount) {
-                        window.game.playerData.inventory[i] = null;
-                    } else {
-                        item.count = itemCount - toRemove;
-                    }
-                    
-                    remainingToRemove -= toRemove;
-                }
-            }
+        for (const [ingredient, count] of Object.entries(recipe.ingredients)) {
+            window.game.removeItemFromInventory(ingredient, count);
         }
         
         // Add crafted item to inventory
-        const craftedItem = {
+        const success = window.game.addItemToInventory({
             name: recipe.result.item,
             count: recipe.result.count,
-            type: 'crafted'
-        };
-        
-        const success = window.game.addItemToInventory(craftedItem);
+            type: ITEM_DATA[recipe.result.item]?.type || 'crafted'
+        });
         
         if (success) {
-            this.showMessage(`Successfully crafted ${recipe.name}!`);
+            this.showTranslatedMessage('crafting_success', { item: recipe.name });
             this.populateCraftingGrid(); // Refresh the grid
         } else {
-            this.showMessage('Inventory is full!');
+            this.showTranslatedMessage('inventory_full');
         }
     }
     
-    showMessage(message) {
-        if (window.game && window.game.hud) {
-            window.game.hud.showMessage(message);
-        } else {
-            console.log(message);
+    show() {
+        const overlay = document.getElementById('crafting-overlay');
+        if (overlay) {
+            overlay.classList.remove('hidden');
+            this.populateCraftingGrid();
         }
     }
     
-    getRecipe(recipeId) {
-        return this.recipes[recipeId];
+    hide() {
+        const overlay = document.getElementById('crafting-overlay');
+        if (overlay) {
+            overlay.classList.add('hidden');
+        }
     }
-    
-    getAllRecipes() {
-        return this.recipes;
-    }
-    
-    getRecipesByCategory(category) {
-        return Object.keys(this.recipes).filter(recipeId => 
-            this.recipes[recipeId].category === category
-        ).map(recipeId => this.recipes[recipeId]);
-    }
+}
+
+// Export for use in other modules
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = Crafting;
 }

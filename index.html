@@ -80,6 +80,13 @@
             <div class="menu-content">
                 <h2>Settings</h2>
                 <div class="settings-section">
+                    <label for="language-select">Language:</label>
+                    <select id="language-select">
+                        <option value="english">English</option>
+                        <option value="gaulsais">Gaulsais</option>
+                    </select>
+                </div>
+                <div class="settings-section">
                     <label for="graphics-quality">Graphics Quality:</label>
                     <select id="graphics-quality">
                         <option value="low">Low</option>
@@ -100,6 +107,13 @@
                     <label for="mouse-sensitivity">Mouse Sensitivity:</label>
                     <input type="range" id="mouse-sensitivity" min="0.1" max="2" step="0.1" value="1">
                 </div>
+                <div class="settings-section">
+                    <p style="font-size: 12px; color: #888; margin-top: 10px;">
+                        <strong>Language Shortcuts:</strong><br>
+                        Ctrl+Shift+E: English<br>
+                        Ctrl+Shift+G: Gaulsais
+                    </p>
+                </div>
                 <button id="settings-back" class="menu-btn">Back</button>
             </div>
         </div>
@@ -108,6 +122,9 @@
         <div id="crafting-overlay" class="menu-overlay hidden">
             <div class="menu-content">
                 <h2>Crafting</h2>
+                <div class="crafting-categories">
+                    <!-- Category tabs will be populated by JavaScript -->
+                </div>
                 <div class="crafting-grid" id="crafting-grid">
                     <!-- Crafting recipes will be populated here -->
                 </div>
@@ -137,6 +154,9 @@
             <p><strong>1-5:</strong> Select inventory slot</p>
             <p><strong>ESC:</strong> Menu</p>
             <p><strong>M:</strong> Map</strong></p>
+            <p><strong>T:</strong> Telepathy ability</p>
+            <p><strong>Y:</strong> Time perception ability</p>
+            <p><strong>V:</strong> Enhanced vision toggle</p>
             <button id="close-instructions" class="menu-btn">Got it!</button>
         </div>
     </div>
@@ -144,6 +164,7 @@
     <!-- Scripts -->
     <script src="js/utils/Constants.js"></script>
     <script src="js/utils/MathUtils.js"></script>
+    <script src="js/utils/LanguageSystem.js"></script>
     <script src="js/core/Game.js"></script>
     <script src="js/core/Scene.js"></script>
     <script src="js/core/Player.js"></script>

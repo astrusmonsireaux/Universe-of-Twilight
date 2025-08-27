@@ -499,6 +499,15 @@ class HUD {
         }, duration);
     }
     
+    showTranslatedMessage(key, params = {}, duration = 3000) {
+        if (window.game && window.game.languageSystem) {
+            const message = window.game.getTranslatedMessage(key, params);
+            this.showMessage(message, duration);
+        } else {
+            this.showMessage(key, duration);
+        }
+    }
+    
     updateMessages() {
         const currentTime = Date.now();
         
@@ -515,7 +524,10 @@ class HUD {
     }
     
     showAbilityUnlocked(abilityName) {
-        this.showMessage(`Ability Unlocked: ${abilityName}!`, 5000);
+        const message = window.game ? 
+            window.game.getTranslatedMessage('ability_unlocked', { ability: abilityName }) :
+            `Ability Unlocked: ${abilityName}!`;
+        this.showMessage(message, 5000);
         
         // Add visual effect to ability indicator
         const indicator = document.getElementById(`${abilityName}-indicator`);
@@ -528,11 +540,17 @@ class HUD {
     }
     
     showEnergyWarning() {
-        this.showMessage('Low Energy! Rest or find sunlight.', 2000);
+        const message = window.game ? 
+            window.game.getTranslatedMessage('low_energy_warning') :
+            'Low Energy! Rest or find sunlight.';
+        this.showMessage(message, 2000);
     }
     
     showHealthWarning() {
-        this.showMessage('Low Health! Find healing items.', 2000);
+        const message = window.game ? 
+            window.game.getTranslatedMessage('low_health_warning') :
+            'Low Health! Find healing items.';
+        this.showMessage(message, 2000);
     }
     
     // Hide/show HUD

@@ -26,6 +26,9 @@ class Game {
         this.crafting = null;
         this.map = null;
         
+        // Language system
+        this.languageSystem = null;
+        
         // Game state
         this.gameMode = 'survival'; // survival, creative, adventure, sandbox
         this.currentLocation = 'Chimera';
@@ -43,7 +46,8 @@ class Game {
             soundVolume: 0.5,
             musicVolume: 0.3,
             mouseSensitivity: 1.0,
-            showInstructions: true
+            showInstructions: true,
+            language: 'english'
         };
         
         // Event listeners
@@ -55,6 +59,10 @@ class Game {
     async init() {
         try {
             console.log('Initializing Veauxalia game...');
+            
+            // Initialize language system first
+            this.languageSystem = new LanguageSystem();
+            this.languageSystem.setLanguage(this.settings.language);
             
             // Initialize core systems
             this.scene = new Scene();
@@ -88,6 +96,9 @@ class Game {
             this.menu.init();
             this.crafting.init();
             this.map.init();
+            
+            // Show welcome message
+            this.showWelcomeMessage();
             
             // Hide loading screen and show game
             this.hideLoadingScreen();
@@ -360,6 +371,14 @@ class Game {
             this.menu.show();
         });
         
+        // Language settings
+        const languageSelect = document.getElementById('language-select');
+        if (languageSelect) {
+            languageSelect.addEventListener('change', (e) => {
+                this.setLanguage(e.target.value);
+            });
+        }
+        
         // Instructions
         document.getElementById('close-instructions').addEventListener('click', () => {
             document.getElementById('instructions').classList.add('hidden');
@@ -372,6 +391,22 @@ class Game {
             slot.addEventListener('click', () => {
                 this.selectInventorySlot(index);
             });
+        });
+        
+        // Keyboard shortcuts for language switching
+        document.addEventListener('keydown', (event) => {
+            if (event.ctrlKey && event.shiftKey) {
+                switch (event.code) {
+                    case 'KeyE':
+                        event.preventDefault();
+                        this.setLanguage('english');
+                        break;
+                    case 'KeyG':
+                        event.preventDefault();
+                        this.setLanguage('gaulsais');
+                        break;
+                }
+            }
         });
     }
     
@@ -825,6 +860,70 @@ class Game {
         
         // Connect orbital mechanics to solar system
         this.orbitalMechanics.setTimeScale(1.0);
+    }
+
+    showWelcomeMessage() {
+        const welcomeMessage = this.languageSystem.translate('welcome', 'messages');
+        const imperialGreeting = this.languageSystem.generateImperialGreeting();
+        
+        setTimeout(() => {
+            this.hud.showMessage(welcomeMessage);
+        }, 1000);
+        
+        setTimeout(() => {
+            this.hud.showMessage(imperialGreeting);
+        }, 3000);
+        
+        // Show Veauxalia time
+        setTimeout(() => {
+            const veauxaliaTime = this.languageSystem.convertToVeauxaliaTime(this.gameTime);
+            this.hud.showMessage(`Current time: ${veauxaliaTime.formatted}`);
+        }, 5000);
+    }
+    
+    setLanguage(language) {
+        this.settings.language = language;
+        this.languageSystem.setLanguage(language);
+        
+        // Update UI elements
+        this.updateUIText();
+        
+        // Show language change message
+        const message = language === 'gaulsais' ? 
+            'Lingua mutata ad Gaulsais!' : 
+            'Language changed to English!';
+        this.hud.showMessage(message);
+    }
+    
+    updateUIText() {
+        // Update menu buttons
+        const menuButtons = document.querySelectorAll('.menu-btn');
+        menuButtons.forEach(button => {
+            const key = button.getAttribute('data-translate');
+            if (key) {
+                button.textContent = this.languageSystem.translate(key, 'ui');
+            }
+        });
+        
+        // Update HUD elements
+        const hudElements = document.querySelectorAll('[data-translate]');
+        hudElements.forEach(element => {
+            const key = element.getAttribute('data-translate');
+            const category = element.getAttribute('data-translate-category') || 'ui';
+            element.textContent = this.languageSystem.translate(key, category);
+        });
+    }
+    
+    getTranslatedMessage(key, params = {}) {
+        return this.languageSystem.translateWithParams(key, params, 'messages');
+    }
+    
+    getTranslatedPlanetName(planetName) {
+        return this.languageSystem.translate(planetName, 'planets');
+    }
+    
+    getTranslatedItemName(itemName) {
+        return this.languageSystem.translate(itemName, 'items');
     }
 }
 

@@ -58,6 +58,120 @@ const GAME_CONSTANTS = {
     MOBILE_UI_SCALE: 1.2
 };
 
+// Gaulsais Language System
+const GAULSAIS_LANGUAGE = {
+    // Basic vocabulary from the Gaulsais Codex
+    greetings: {
+        "hello": "Salve",
+        "goodbye": "Vale",
+        "welcome": "Benevenite",
+        "farewell": "Ave atque vale"
+    },
+    
+    numbers: {
+        0: "Nullus", 1: "Unus", 2: "Duo", 3: "Tres", 4: "Quattuor", 5: "Quinque",
+        6: "Sex", 7: "Septem", 8: "Octo", 9: "Novem", 10: "Decem",
+        100: "Centum", 500: "Quingenti", 1000: "Mille"
+    },
+    
+    time: {
+        "day": "Dies",
+        "night": "Nox",
+        "month": "Mensis",
+        "year": "Annus",
+        "hour": "Hora",
+        "minute": "Minuta"
+    },
+    
+    months: [
+        "Primus", "Secundus", "Tertius", "Quartus", "Quintus",
+        "Sextus", "Septimus", "Octavus", "Nonus", "Decimus",
+        "Undecimus", "Duodecimus", "Tertius Decimus", "Quartus Decimus", "Quintus Decimus",
+        "Sextus Decimus", "Septimus Decimus", "Octavus Decimus", "Nonus Decimus", "Vicesimus"
+    ],
+    
+    days: [
+        "Prima Dies", "Secunda Dies", "Tertia Dies", "Quarta Dies", "Quinta Dies"
+    ],
+    
+    // Political and cultural terms
+    government: {
+        "empire": "Imperium",
+        "democracy": "Democratia",
+        "emperor": "Imperator",
+        "senate": "Senatus",
+        "citizen": "Civis",
+        "law": "Lex",
+        "constitution": "Constitutio"
+    },
+    
+    // Scientific and technological terms
+    science: {
+        "star": "Stella",
+        "planet": "Planeta",
+        "sun": "Sol",
+        "moon": "Luna",
+        "galaxy": "Galaxia",
+        "universe": "Universum",
+        "energy": "Energia",
+        "matter": "Materia",
+        "time": "Tempus",
+        "space": "Spatium"
+    },
+    
+    // Homo Kaylex specific terms
+    species: {
+        "photosynthesis": "Photosynthesis",
+        "telepathy": "Telepathia",
+        "vision": "Visus",
+        "truth": "Veritas",
+        "life": "Vita",
+        "death": "Mors",
+        "birth": "Natus",
+        "growth": "Crescentia"
+    }
+};
+
+// United Empire of Gauletria Political System
+const UNITED_EMPIRE = {
+    name: "United Empire of Gauletria",
+    type: "Imperial Elastic Democracy",
+    capital: "Imperial City of Gauletria",
+    population: "Type 1 Civilization",
+    religion: "Atheistic Society",
+    language: "Gaulsais",
+    
+    government: {
+        structure: "Imperial Elastic Democracy",
+        emperor: "Elected for life with democratic oversight",
+        senate: "Representative body with legislative powers",
+        judiciary: "Independent court system",
+        military: "Defensive forces with democratic control"
+    },
+    
+    society: {
+        education: "Universal access to advanced knowledge",
+        healthcare: "Comprehensive medical system",
+        technology: "Type 1 civilization capabilities",
+        culture: "Diverse and inclusive society",
+        values: ["Truth", "Justice", "Progress", "Unity"]
+    },
+    
+    territories: {
+        homeworld: "Chimera",
+        colonies: ["Neflaym", "Elisium"],
+        outposts: ["Phantom", "Titan"],
+        exploration: "Active space exploration programs"
+    },
+    
+    achievements: {
+        spaceflight: "Interplanetary and interstellar travel",
+        energy: "Advanced energy systems",
+        communication: "Galactic communication networks",
+        diplomacy: "Peaceful relations with other civilizations"
+    }
+};
+
 // Solar System Constants
 const SOLAR_SYSTEM = {
     // Stars

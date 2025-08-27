@@ -326,86 +326,6 @@ body {
     z-index: 200;
 }
 
-.menu-content {
-    background: linear-gradient(135deg, rgba(26, 26, 46, 0.9), rgba(22, 33, 62, 0.9));
-    border: 2px solid #00d4ff;
-    border-radius: 15px;
-    padding: 2rem;
-    max-width: 500px;
-    width: 90%;
-    text-align: center;
-}
-
-.menu-content h2 {
-    font-family: 'Orbitron', monospace;
-    color: #00d4ff;
-    margin-bottom: 2rem;
-    font-size: 2rem;
-}
-
-.menu-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.menu-btn {
-    background: rgba(0, 0, 0, 0.6);
-    border: 2px solid #333;
-    color: #fff;
-    padding: 15px 30px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-family: 'Exo 2', sans-serif;
-    font-size: 16px;
-    transition: all 0.2s ease;
-}
-
-.menu-btn:hover {
-    border-color: #00d4ff;
-    background: rgba(0, 212, 255, 0.1);
-    transform: translateY(-2px);
-}
-
-/* Settings Styles */
-.settings-section {
-    margin-bottom: 20px;
-    text-align: left;
-}
-
-.settings-section label {
-    display: block;
-    margin-bottom: 5px;
-    color: #00d4ff;
-    font-weight: 600;
-}
-
-.settings-section select,
-.settings-section input[type="range"] {
-    width: 100%;
-    padding: 8px;
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid #333;
-    border-radius: 5px;
-    color: #fff;
-}
-
-.settings-section input[type="range"] {
-    height: 6px;
-    background: #333;
-    outline: none;
-    -webkit-appearance: none;
-}
-
-.settings-section input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 20px;
-    height: 20px;
-    background: #00d4ff;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
 /* Enhanced Crafting Styles */
 .crafting-grid {
     display: flex;
@@ -443,6 +363,18 @@ body {
     border-color: #00d4ff;
     background: rgba(0, 212, 255, 0.2);
     color: #00d4ff;
+}
+
+.category-section {
+    margin-bottom: 20px;
+}
+
+.category-title {
+    color: #00d4ff;
+    font-size: 16px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 5px;
 }
 
 .category-container {
@@ -494,6 +426,16 @@ body {
     line-height: 1.3;
 }
 
+.crafting-item .lore {
+    font-size: 10px;
+    color: #888;
+    font-style: italic;
+    margin-bottom: 8px;
+    line-height: 1.2;
+    border-left: 2px solid #00d4ff;
+    padding-left: 8px;
+}
+
 .crafting-item .ingredients {
     font-size: 10px;
     color: #888;
@@ -506,15 +448,15 @@ body {
     font-weight: bold;
 }
 
-/* Map Styles */
+/* Enhanced Map Styles */
 .map-content {
-    max-width: 800px;
-    max-height: 600px;
+    max-width: 1000px;
+    max-height: 700px;
 }
 
 .system-map {
     width: 100%;
-    height: 400px;
+    height: 500px;
     background: rgba(0, 0, 0, 0.6);
     border: 1px solid #333;
     border-radius: 10px;
@@ -523,30 +465,262 @@ body {
     overflow: hidden;
 }
 
-/* Instructions */
-.instructions {
+.map-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.map-view-buttons {
+    display: flex;
+    gap: 5px;
+}
+
+.map-zoom-controls {
+    display: flex;
+    gap: 5px;
+}
+
+.map-btn {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid #333;
+    border-radius: 5px;
+    padding: 8px 12px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 12px;
+}
+
+.map-btn:hover {
+    border-color: #00d4ff;
+    background: rgba(0, 212, 255, 0.1);
+}
+
+.map-btn.active {
+    border-color: #00d4ff;
+    background: rgba(0, 212, 255, 0.2);
+    color: #00d4ff;
+}
+
+.map-info {
+    flex: 1;
+    margin-left: 20px;
+}
+
+.info-panel {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 15px;
+    min-height: 100px;
+}
+
+.info-panel h4 {
+    color: #00d4ff;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.info-panel p {
+    margin-bottom: 5px;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.planet-details {
+    color: #fff;
+}
+
+.planet-details h3 {
+    color: #00d4ff;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.planet-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.planet-stats p {
+    margin-bottom: 5px;
+    font-size: 12px;
+}
+
+.planet-biomes h4 {
+    color: #00d4ff;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.planet-biomes ul {
+    list-style: none;
+    padding: 0;
+}
+
+.planet-biomes li {
+    font-size: 11px;
+    margin-bottom: 3px;
+    padding-left: 10px;
+    position: relative;
+}
+
+.planet-biomes li:before {
+    content: "•";
+    color: #00d4ff;
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    left: 0;
+}
+
+.planet-actions {
+    text-align: center;
+}
+
+.planet-actions .map-btn {
+    background: rgba(0, 255, 0, 0.2);
+    border-color: #00ff00;
+    color: #00ff00;
+    padding: 10px 20px;
+    font-size: 14px;
+}
+
+.planet-actions .map-btn:hover {
+    background: rgba(0, 255, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+/* Map Tooltip */
+.map-tooltip {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 1000;
+    pointer-events: none;
+    border: 1px solid #00d4ff;
+}
+
+/* Enhanced Menu Styles */
+.menu-content {
     background: linear-gradient(135deg, rgba(26, 26, 46, 0.95), rgba(22, 33, 62, 0.95));
     border: 2px solid #00d4ff;
     border-radius: 15px;
     padding: 2rem;
-    max-width: 400px;
+    max-width: 600px;
+    width: 90%;
     text-align: center;
-    z-index: 150;
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
 }
 
-.instructions h3 {
+.menu-content h2 {
     font-family: 'Orbitron', monospace;
     color: #00d4ff;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
 }
 
-.instructions p {
-    margin-bottom: 0.5rem;
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.menu-btn {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid #333;
+    color: #fff;
+    padding: 15px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.menu-btn:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.menu-btn:hover:before {
+    left: 100%;
+}
+
+.menu-btn:hover {
+    border-color: #00d4ff;
+    background: rgba(0, 212, 255, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
+}
+
+/* Enhanced Settings Styles */
+.settings-section {
+    margin-bottom: 20px;
     text-align: left;
+}
+
+.settings-section label {
+    display: block;
+    margin-bottom: 5px;
+    color: #00d4ff;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.settings-section select,
+.settings-section input[type="range"] {
+    width: 100%;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid #333;
+    border-radius: 5px;
+    color: #fff;
+    transition: border-color 0.2s ease;
+}
+
+.settings-section select:focus,
+.settings-section input[type="range"]:focus {
+    border-color: #00d4ff;
+    outline: none;
+}
+
+.settings-section input[type="range"] {
+    height: 6px;
+    background: #333;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.settings-section input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #00d4ff;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+.settings-section input[type="range"]::-webkit-slider-thumb:hover {
+    background: #00ffff;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
 }
 
 /* Responsive Design */
@@ -608,6 +782,19 @@ body {
         padding: 12px 24px;
         font-size: 14px;
     }
+    
+    .instructions {
+        max-width: 350px;
+        padding: 1.5rem;
+    }
+    
+    .instructions h3 {
+        font-size: 1.2rem;
+    }
+    
+    .instructions p {
+        font-size: 12px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -628,6 +815,87 @@ body {
     .control-btn {
         padding: 6px 12px;
         font-size: 11px;
+    }
+    
+    .instructions {
+        max-width: 300px;
+        padding: 1rem;
+    }
+    
+    .instructions h3 {
+        font-size: 1rem;
+    }
+    
+    .instructions p {
+        font-size: 11px;
+    }
+}
+
+/* Responsive Design for Enhanced Features */
+@media (max-width: 768px) {
+    .map-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .map-view-buttons,
+    .map-zoom-controls {
+        justify-content: center;
+    }
+    
+    .map-info {
+        margin-left: 0;
+        margin-top: 15px;
+    }
+    
+    .planet-info {
+        grid-template-columns: 1fr;
+    }
+    
+    .category-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .crafting-categories {
+        justify-content: center;
+    }
+    
+    .category-tab {
+        font-size: 11px;
+        padding: 6px 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .map-btn {
+        padding: 6px 8px;
+        font-size: 11px;
+    }
+    
+    .info-panel {
+        padding: 10px;
+    }
+    
+    .info-panel h4 {
+        font-size: 14px;
+    }
+    
+    .info-panel p {
+        font-size: 11px;
+    }
+    
+    .crafting-item {
+        padding: 10px;
+        min-height: 100px;
+    }
+    
+    .crafting-item h4 {
+        font-size: 12px;
+    }
+    
+    .crafting-item .description,
+    .crafting-item .lore {
+        font-size: 10px;
     }
 }
 
@@ -667,4 +935,34 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #ff00ff;
+}
+
+/* Instructions */
+.instructions {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.95), rgba(22, 33, 62, 0.95));
+    border: 2px solid #00d4ff;
+    border-radius: 15px;
+    padding: 2rem;
+    max-width: 400px;
+    text-align: center;
+    z-index: 150;
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+}
+
+.instructions h3 {
+    font-family: 'Orbitron', monospace;
+    color: #00d4ff;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+.instructions p {
+    margin-bottom: 0.5rem;
+    text-align: left;
+    font-size: 14px;
+    line-height: 1.4;
 }
