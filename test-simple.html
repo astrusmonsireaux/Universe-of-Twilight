@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veauxalia Simple Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .test-section {
+            background: #2a2a2a;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        #test-canvas {
+            border: 1px solid #333;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Veauxalia Simple Test</h1>
+    
+    <div class="test-section">
+        <h2>Three.js Test</h2>
+        <div id="threejs-status">Checking...</div>
+        <button onclick="testThreeJS()">Test Three.js</button>
+        <canvas id="test-canvas" width="300" height="200"></canvas>
+    </div>
+    
+    <div class="test-section">
+        <h2>Game Classes Test</h2>
+        <div id="classes-status">Checking...</div>
+        <button onclick="loadGameClasses()">Load Game Classes</button>
+        <button onclick="testGameInit()">Test Game Initialization</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Console Output</h2>
+        <div id="console-output" style="background: #000; color: #0f0; padding: 10px; border-radius: 5px; font-family: monospace; height: 200px; overflow-y: auto;"></div>
+    </div>
+
+    <script src="js/three.min.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/GLTFLoader.js"></script>
+    
+    <script>
+        // Override console methods
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        function addToConsole(type, ...args) {
+            const output = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            const message = `[${timestamp}] ${type}: ${args.join(' ')}\n`;
+            output.textContent += message;
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToConsole('LOG', ...args);
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToConsole('ERROR', ...args);
+        };
+        
+        // Test Three.js
+        function testThreeJS() {
+            const status = document.getElementById('threejs-status');
+            
+            if (typeof THREE === 'undefined') {
+                status.innerHTML = '<span class="error">Three.js not loaded</span>';
+                return;
+            }
+            
+            try {
+                status.innerHTML = `<span class="success">Three.js loaded (v${THREE.REVISION})</span>`;
+                
+                // Create a simple scene
+                const canvas = document.getElementById('test-canvas');
+                const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+                renderer.setSize(300, 200);
+                
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, 300 / 200, 0.1, 1000);
+                camera.position.z = 5;
+                
+                const geometry = new THREE.BoxGeometry();
+                const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+                const cube = new THREE.Mesh(geometry, material);
+                scene.add(cube);
+                
+                function animate() {
+                    requestAnimationFrame(animate);
+                    cube.rotation.x += 0.01;
+                    cube.rotation.y += 0.01;
+                    renderer.render(scene, camera);
+                }
+                
+                animate();
+                console.log('Three.js test successful - green cube should be rotating');
+                
+            } catch (error) {
+                status.innerHTML = `<span class="error">Three.js test failed: ${error.message}</span>`;
+                console.error('Three.js test failed:', error);
+            }
+        }
+        
+        function loadGameClasses() {
+            const status = document.getElementById('classes-status');
+            status.innerHTML = 'Loading game classes...';
+            
+            const scripts = [
+                'js/utils/Constants.js',
+                'js/utils/MathUtils.js',
+                'js/utils/LanguageSystem.js',
+                'js/systems/PoliticalSystem.js',
+                'js/systems/CulturalSystem.js',
+                'js/core/Game.js',
+                'js/core/Scene.js',
+                'js/core/Player.js',
+                'js/core/Camera.js',
+                'js/core/Controls.js',
+                'js/world/Planet.js',
+                'js/world/Star.js',
+                'js/world/SolarSystem.js',
+                'js/world/Terrain.js',
+                'js/world/Atmosphere.js',
+                'js/systems/Physics.js',
+                'js/systems/OrbitalMechanics.js',
+                'js/systems/Weather.js',
+                'js/ui/HUD.js',
+                'js/ui/Menu.js',
+                'js/ui/Crafting.js',
+                'js/ui/Map.js',
+                'js/ui/ImperialUI.js',
+                'js/data/PlanetData.js',
+                'js/data/StarData.js',
+                'js/data/ItemData.js'
+            ];
+            
+            let loadedCount = 0;
+            let failedCount = 0;
+            
+            scripts.forEach(script => {
+                const scriptElement = document.createElement('script');
+                scriptElement.src = script;
+                scriptElement.onload = () => {
+                    loadedCount++;
+                    console.log(`Loaded: ${script} (${loadedCount}/${scripts.length})`);
+                    if (loadedCount + failedCount === scripts.length) {
+                        checkGameClasses();
+                    }
+                };
+                scriptElement.onerror = () => {
+                    failedCount++;
+                    console.error(`Failed to load: ${script}`);
+                    if (loadedCount + failedCount === scripts.length) {
+                        checkGameClasses();
+                    }
+                };
+                document.head.appendChild(scriptElement);
+            });
+        }
+        
+        function checkGameClasses() {
+            const status = document.getElementById('classes-status');
+            const requiredClasses = [
+                'LanguageSystem', 'PoliticalSystem', 'CulturalSystem', 'ImperialUI',
+                'Scene', 'Player', 'Camera', 'Controls', 'Planet', 'SolarSystem',
+                'Physics', 'Weather', 'OrbitalMechanics', 'HUD', 'Menu', 'Crafting', 'Map'
+            ];
+            
+            let availableCount = 0;
+            let html = '';
+            
+            requiredClasses.forEach(className => {
+                if (typeof window[className] !== 'undefined') {
+                    html += `<span class="success">${className}</span> `;
+                    availableCount++;
+                } else {
+                    html += `<span class="error">${className}</span> `;
+                }
+            });
+            
+            html += `<br><br><strong>Available: ${availableCount}/${requiredClasses.length}</strong>`;
+            status.innerHTML = html;
+        }
+        
+        function testGameInit() {
+            if (typeof Game === 'undefined') {
+                console.error('Game class not available');
+                return;
+            }
+            
+            try {
+                console.log('Testing game initialization...');
+                const game = new Game();
+                console.log('Game initialization successful!');
+                console.log('Game object:', game);
+            } catch (error) {
+                console.error('Game initialization failed:', error);
+            }
+        }
+        
+        // Initialize
+        window.addEventListener('load', () => {
+            console.log('Simple test page loaded');
+            testThreeJS();
+        });
+    </script>
+</body>
+</html>

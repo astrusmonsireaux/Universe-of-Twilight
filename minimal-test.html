@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Three.js Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 100;
+            background: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        #status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success { background: #4CAF50; }
+        .error { background: #f44336; }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h3>Minimal Three.js Test</h3>
+        <div id="status">Loading...</div>
+        <button onclick="location.reload()">Reload</button>
+    </div>
+
+    <script src="js/three.min.js"></script>
+    
+    <script>
+        const status = document.getElementById('status');
+        
+        function updateStatus(message, isError = false) {
+            status.textContent = message;
+            status.className = isError ? 'error' : 'success';
+            console.log(message);
+        }
+        
+        // Test Three.js loading
+        if (typeof THREE === 'undefined') {
+            updateStatus('❌ Three.js failed to load', true);
+        } else {
+            updateStatus(`✅ Three.js loaded successfully (v${THREE.REVISION})`);
+            
+            try {
+                // Create a simple scene
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer();
+                
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                document.body.appendChild(renderer.domElement);
+                
+                // Create a cube
+                const geometry = new THREE.BoxGeometry();
+                const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+                const cube = new THREE.Mesh(geometry, material);
+                scene.add(cube);
+                
+                camera.position.z = 5;
+                
+                // Animation loop
+                function animate() {
+                    requestAnimationFrame(animate);
+                    cube.rotation.x += 0.01;
+                    cube.rotation.y += 0.01;
+                    renderer.render(scene, camera);
+                }
+                
+                animate();
+                updateStatus('✅ Three.js working - green cube should be rotating');
+                
+            } catch (error) {
+                updateStatus(`❌ Three.js test failed: ${error.message}`, true);
+            }
+        }
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        });
+    </script>
+</body>
+</html>

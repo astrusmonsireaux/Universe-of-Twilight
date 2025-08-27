@@ -6,108 +6,18 @@
     <title>Veauxalia: Universe of Twilight</title>
     <link rel="stylesheet" href="styles/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- Three.js with multiple fallback sources -->
-    <script>
-        // Function to load Three.js with multiple fallbacks
-        function loadThreeJS() {
-            const sources = [
-                'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
-                'https://unpkg.com/three@0.128.0/build/three.min.js',
-                'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js',
-                'https://threejs.org/build/three.min.js',
-                './js/three.min.js' // Local fallback
-            ];
-            
-            function tryLoadSource(index) {
-                if (index >= sources.length) {
-                    console.error('All Three.js sources failed to load');
-                    showError('Failed to load Three.js library. Please check your internet connection and refresh the page.');
-                    return;
-                }
-                
-                const script = document.createElement('script');
-                script.src = sources[index];
-                script.onload = function() {
-                    console.log('Three.js loaded successfully from:', sources[index]);
-                    // Load OrbitControls and GLTFLoader after Three.js
-                    loadThreeJSExtensions();
-                };
-                script.onerror = function() {
-                    console.warn('Failed to load Three.js from:', sources[index]);
-                    tryLoadSource(index + 1);
-                };
-                document.head.appendChild(script);
-            }
-            
-            function loadThreeJSExtensions() {
-                const extensionSources = [
-                    'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js',
-                    'https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js',
-                    'https://threejs.org/examples/js/controls/OrbitControls.js'
-                ];
-                
-                function tryLoadExtension(index) {
-                    if (index >= extensionSources.length) {
-                        console.warn('OrbitControls failed to load, but continuing...');
-                        return;
-                    }
-                    
-                    const script = document.createElement('script');
-                    script.src = extensionSources[index];
-                    script.onload = function() {
-                        console.log('OrbitControls loaded successfully');
-                    };
-                    script.onerror = function() {
-                        console.warn('Failed to load OrbitControls from:', extensionSources[index]);
-                        tryLoadExtension(index + 1);
-                    };
-                    document.head.appendChild(script);
-                }
-                
-                tryLoadExtension(0);
-                
-                // Load GLTFLoader
-                const gltfSources = [
-                    'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js',
-                    'https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js',
-                    'https://threejs.org/examples/js/loaders/GLTFLoader.js'
-                ];
-                
-                function tryLoadGLTF(index) {
-                    if (index >= gltfSources.length) {
-                        console.warn('GLTFLoader failed to load, but continuing...');
-                        return;
-                    }
-                    
-                    const script = document.createElement('script');
-                    script.src = gltfSources[index];
-                    script.onload = function() {
-                        console.log('GLTFLoader loaded successfully');
-                    };
-                    script.onerror = function() {
-                        console.warn('Failed to load GLTFLoader from:', gltfSources[index]);
-                        tryLoadGLTF(index + 1);
-                    };
-                    document.head.appendChild(script);
-                }
-                
-                tryLoadGLTF(0);
-            }
-            
-            tryLoadSource(0);
-        }
-        
-        // Start loading Three.js immediately
-        loadThreeJS();
-    </script>
+    <!-- Local Three.js libraries -->
+    <script src="js/three.min.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/GLTFLoader.js"></script>
     <script>
         // Check if Three.js loaded properly
         window.addEventListener('load', function() {
             if (typeof THREE === 'undefined') {
                 console.error('Three.js failed to load');
-                showError('Three.js library failed to load. Please check your internet connection and refresh the page.');
+                showError('Three.js library failed to load. Please refresh the page.');
             } else {
-                console.log('Three.js loaded successfully');
+                console.log('Three.js loaded successfully (v' + THREE.REVISION + ')');
             }
         });
         
