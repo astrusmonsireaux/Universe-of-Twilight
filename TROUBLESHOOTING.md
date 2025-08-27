@@ -6,6 +6,28 @@
 
 If you're seeing a "failed to initialize error" when loading the game on GitHub Pages, try these solutions:
 
+#### Mobile-Specific Issues
+If you're on a mobile device (especially Firefox on Android), the most common issue is **Three.js failing to load from CDN**. Try these solutions:
+
+1. **Use Mobile Debug Page**
+   - Navigate to `/mobile-debug.html` on your GitHub Pages site
+   - This page is specifically designed for mobile troubleshooting
+   - Use the "Force Load Three.js" button if Three.js fails to load
+
+2. **Network Restrictions**
+   - Mobile networks often block or slow CDN requests
+   - Try switching between WiFi and mobile data
+   - Disable VPN if you're using one
+
+3. **Browser Settings**
+   - Enable JavaScript in your mobile browser
+   - Allow cross-origin requests
+   - Clear browser cache and cookies
+
+4. **Alternative Browsers**
+   - Try Chrome or Safari on mobile
+   - Firefox on Android sometimes has CDN loading issues
+
 #### 1. Check Browser Console
 - Press F12 to open developer tools
 - Go to the Console tab

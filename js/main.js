@@ -17,6 +17,12 @@ function updateLoadingProgress(progress, text, details = '') {
 
 // Initialize game when DOM is loaded
 document.addEventListener('DOMContentLoaded', async () => {
+    // For mobile browsers, wait a bit longer for scripts to load
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile) {
+        console.log('Mobile device detected - applying mobile loading strategy');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
     try {
         console.log('Starting Veauxalia game initialization...');
         
@@ -27,7 +33,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Check if Three.js is available
         if (typeof THREE === 'undefined') {
-            throw new Error('Three.js library not loaded. Please refresh the page.');
+            // Wait a bit longer for mobile browsers
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            if (typeof THREE === 'undefined') {
+                throw new Error('Three.js library not loaded. This may be due to network issues or browser restrictions. Please refresh the page or try a different browser.');
+            }
         }
         
         // Update loading progress
