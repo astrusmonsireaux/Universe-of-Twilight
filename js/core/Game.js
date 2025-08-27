@@ -158,6 +158,14 @@ class Game {
     update(deltaTime) {
         this.gameTime += deltaTime;
         
+        // Update player movement based on controls
+        this.player.move(this.controls, deltaTime);
+        
+        // Handle jumping
+        if (this.controls.jump) {
+            this.player.jump();
+        }
+        
         // Update core systems
         this.player.update(deltaTime);
         this.camera.update(deltaTime);
@@ -176,6 +184,10 @@ class Game {
         
         // Update player stats
         this.updatePlayerStats(deltaTime);
+        
+        // Update HUD with player position
+        const playerPos = this.player.getPosition();
+        this.hud.updateCoordinates(playerPos.x, playerPos.y, playerPos.z);
     }
     
     render() {

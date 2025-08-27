@@ -30,6 +30,10 @@ class Player {
         this.runSpeed = GAME_CONSTANTS.RUN_SPEED;
         this.flySpeed = GAME_CONSTANTS.FLY_SPEED;
         
+        // Collision
+        this.radius = 0.3;
+        this.height = 1.8;
+        
         // Mesh
         this.mesh = null;
         this.createMesh();
@@ -88,11 +92,6 @@ class Player {
     }
     
     update(deltaTime) {
-        // Update position based on velocity
-        this.position.x += this.velocity.x * deltaTime;
-        this.position.y += this.velocity.y * deltaTime;
-        this.position.z += this.velocity.z * deltaTime;
-        
         // Apply gravity
         if (!this.onGround && !this.isFlying) {
             this.velocity.y -= this.gravity * deltaTime;
@@ -100,6 +99,14 @@ class Player {
         
         // Clamp velocity
         this.velocity.y = Math.max(-this.terminalVelocity, this.velocity.y);
+        
+        // Update position based on velocity
+        this.position.x += this.velocity.x * deltaTime;
+        this.position.y += this.velocity.y * deltaTime;
+        this.position.z += this.velocity.z * deltaTime;
+        
+        // Check terrain collision
+        this.checkTerrainCollision();
         
         // Update mesh position
         if (this.mesh) {
@@ -109,6 +116,24 @@ class Player {
         
         // Photosynthesis effect (subtle glow)
         this.updatePhotosynthesis(deltaTime);
+    }
+    
+    checkTerrainCollision() {
+        // Get terrain height at current position
+        if (window.game && window.game.currentPlanet) {
+            const terrainHeight = window.game.currentPlanet.getHeightAt(this.position.x, this.position.z);
+            const groundLevel = terrainHeight + this.height * 0.5;
+            
+            // Check if player is on ground
+            if (this.position.y <= groundLevel) {
+                this.position.y = groundLevel;
+                this.velocity.y = 0;
+                this.onGround = true;
+                this.isJumping = false;
+            } else {
+                this.onGround = false;
+            }
+        }
     }
     
     updatePhotosynthesis(deltaTime) {
