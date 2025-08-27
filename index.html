@@ -9,6 +9,58 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <!-- Fallback CDN links -->
+    <script>
+        if (typeof THREE === 'undefined') {
+            document.write('<script src="https://unpkg.com/three@0.128.0/build/three.min.js"><\/script>');
+            document.write('<script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"><\/script>');
+            document.write('<script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"><\/script>');
+        }
+    </script>
+    <script>
+        // Check if Three.js loaded properly
+        window.addEventListener('load', function() {
+            if (typeof THREE === 'undefined') {
+                console.error('Three.js failed to load');
+                showError('Three.js library failed to load. Please check your internet connection and refresh the page.');
+            } else {
+                console.log('Three.js loaded successfully');
+            }
+        });
+        
+        // Global error handler
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(255, 0, 0, 0.9);
+                color: white;
+                padding: 20px;
+                border-radius: 10px;
+                z-index: 10000;
+                font-family: Arial, sans-serif;
+                text-align: center;
+                max-width: 400px;
+            `;
+            errorDiv.innerHTML = `
+                <h3>Initialization Error</h3>
+                <p>${message}</p>
+                <button onclick="location.reload()" style="
+                    background: white;
+                    color: red;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    margin-top: 10px;
+                ">Refresh Page</button>
+            `;
+            document.body.appendChild(errorDiv);
+        }
+    </script>
 </head>
 <body>
     <!-- Loading Screen -->
@@ -20,6 +72,7 @@
                 <div class="loading-progress" id="loading-progress"></div>
             </div>
             <p class="loading-text" id="loading-text">Initializing universe...</p>
+            <p class="loading-details" id="loading-details" style="font-size: 12px; color: #888; margin-top: 10px;"></p>
         </div>
     </div>
 

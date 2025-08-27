@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veauxalia Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .debug-section {
+            background: #2a2a2a;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .warning { color: #ff9800; }
+        .info { color: #2196F3; }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        #console-output {
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Veauxalia Debug Console</h1>
+    
+    <div class="debug-section">
+        <h2>Environment Check</h2>
+        <div id="environment-status"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Dependencies Check</h2>
+        <div id="dependencies-status"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Three.js Test</h2>
+        <div id="threejs-status"></div>
+        <button onclick="testThreeJS()">Test Three.js</button>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Game Classes Check</h2>
+        <div id="classes-status"></div>
+        <button onclick="checkGameClasses()">Check Game Classes</button>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Console Output</h2>
+        <div id="console-output"></div>
+        <button onclick="clearConsole()">Clear Console</button>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Actions</h2>
+        <button onclick="loadMainGame()">Load Main Game</button>
+        <button onclick="testGameInitialization()">Test Game Initialization</button>
+    </div>
+
+    <script>
+        // Override console.log to capture output
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        function addToConsole(type, ...args) {
+            const output = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            const message = `[${timestamp}] ${type}: ${args.join(' ')}\n`;
+            output.textContent += message;
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToConsole('LOG', ...args);
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToConsole('ERROR', ...args);
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addToConsole('WARN', ...args);
+        };
+        
+        function clearConsole() {
+            document.getElementById('console-output').textContent = '';
+        }
+        
+        function checkEnvironment() {
+            const status = document.getElementById('environment-status');
+            let html = '';
+            
+            // Check browser
+            html += `<p><strong>Browser:</strong> <span class="info">${navigator.userAgent}</span></p>`;
+            
+            // Check WebGL support
+            const canvas = document.createElement('canvas');
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            if (gl) {
+                html += `<p><strong>WebGL:</strong> <span class="success">Supported</span></p>`;
+            } else {
+                html += `<p><strong>WebGL:</strong> <span class="error">Not Supported</span></p>`;
+            }
+            
+            // Check service worker support
+            if ('serviceWorker' in navigator) {
+                html += `<p><strong>Service Worker:</strong> <span class="success">Supported</span></p>`;
+            } else {
+                html += `<p><strong>Service Worker:</strong> <span class="warning">Not Supported</span></p>`;
+            }
+            
+            // Check performance API
+            if ('performance' in window) {
+                html += `<p><strong>Performance API:</strong> <span class="success">Supported</span></p>`;
+            } else {
+                html += `<p><strong>Performance API:</strong> <span class="warning">Not Supported</span></p>`;
+            }
+            
+            status.innerHTML = html;
+        }
+        
+        function checkDependencies() {
+            const status = document.getElementById('dependencies-status');
+            let html = '';
+            
+            // Check if Three.js is loaded
+            if (typeof THREE !== 'undefined') {
+                html += `<p><strong>Three.js:</strong> <span class="success">Loaded (v${THREE.REVISION})</span></p>`;
+            } else {
+                html += `<p><strong>Three.js:</strong> <span class="error">Not Loaded</span></p>`;
+            }
+            
+            // Check if OrbitControls is available
+            if (typeof THREE !== 'undefined' && THREE.OrbitControls) {
+                html += `<p><strong>OrbitControls:</strong> <span class="success">Available</span></p>`;
+            } else {
+                html += `<p><strong>OrbitControls:</strong> <span class="error">Not Available</span></p>`;
+            }
+            
+            // Check if GLTFLoader is available
+            if (typeof THREE !== 'undefined' && THREE.GLTFLoader) {
+                html += `<p><strong>GLTFLoader:</strong> <span class="success">Available</span></p>`;
+            } else {
+                html += `<p><strong>GLTFLoader:</strong> <span class="error">Not Available</span></p>`;
+            }
+            
+            status.innerHTML = html;
+        }
+        
+        function testThreeJS() {
+            const status = document.getElementById('threejs-status');
+            
+            if (typeof THREE === 'undefined') {
+                status.innerHTML = '<p><span class="error">Three.js is not loaded</span></p>';
+                return;
+            }
+            
+            try {
+                // Create a simple scene
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer();
+                
+                renderer.setSize(200, 200);
+                document.body.appendChild(renderer.domElement);
+                
+                const geometry = new THREE.BoxGeometry();
+                const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+                const cube = new THREE.Mesh(geometry, material);
+                scene.add(cube);
+                
+                camera.position.z = 5;
+                
+                function animate() {
+                    requestAnimationFrame(animate);
+                    cube.rotation.x += 0.01;
+                    cube.rotation.y += 0.01;
+                    renderer.render(scene, camera);
+                }
+                
+                animate();
+                
+                status.innerHTML = '<p><span class="success">Three.js test successful! Green cube should be rotating.</span></p>';
+                
+                // Remove the test renderer after 3 seconds
+                setTimeout(() => {
+                    document.body.removeChild(renderer.domElement);
+                }, 3000);
+                
+            } catch (error) {
+                status.innerHTML = `<p><span class="error">Three.js test failed: ${error.message}</span></p>`;
+            }
+        }
+        
+        function checkGameClasses() {
+            const status = document.getElementById('classes-status');
+            let html = '';
+            
+            const requiredClasses = [
+                'LanguageSystem', 'PoliticalSystem', 'CulturalSystem', 'ImperialUI',
+                'Scene', 'Player', 'Camera', 'Controls', 'Planet', 'SolarSystem',
+                'Physics', 'Weather', 'OrbitalMechanics', 'HUD', 'Menu', 'Crafting', 'Map'
+            ];
+            
+            requiredClasses.forEach(className => {
+                if (typeof window[className] !== 'undefined') {
+                    html += `<p><strong>${className}:</strong> <span class="success">Available</span></p>`;
+                } else {
+                    html += `<p><strong>${className}:</strong> <span class="error">Not Available</span></p>`;
+                }
+            });
+            
+            status.innerHTML = html;
+        }
+        
+        function loadMainGame() {
+            // Load all the game scripts
+            const scripts = [
+                'js/utils/Constants.js',
+                'js/utils/MathUtils.js',
+                'js/utils/LanguageSystem.js',
+                'js/systems/PoliticalSystem.js',
+                'js/systems/CulturalSystem.js',
+                'js/core/Game.js',
+                'js/core/Scene.js',
+                'js/core/Player.js',
+                'js/core/Camera.js',
+                'js/core/Controls.js',
+                'js/world/Planet.js',
+                'js/world/Star.js',
+                'js/world/SolarSystem.js',
+                'js/world/Terrain.js',
+                'js/world/Atmosphere.js',
+                'js/systems/Physics.js',
+                'js/systems/OrbitalMechanics.js',
+                'js/systems/Weather.js',
+                'js/ui/HUD.js',
+                'js/ui/Menu.js',
+                'js/ui/Crafting.js',
+                'js/ui/Map.js',
+                'js/ui/ImperialUI.js',
+                'js/data/PlanetData.js',
+                'js/data/StarData.js',
+                'js/data/ItemData.js'
+            ];
+            
+            let loadedCount = 0;
+            
+            scripts.forEach(script => {
+                const scriptElement = document.createElement('script');
+                scriptElement.src = script;
+                scriptElement.onload = () => {
+                    loadedCount++;
+                    console.log(`Loaded: ${script} (${loadedCount}/${scripts.length})`);
+                    if (loadedCount === scripts.length) {
+                        console.log('All game scripts loaded successfully');
+                        checkGameClasses();
+                    }
+                };
+                scriptElement.onerror = () => {
+                    console.error(`Failed to load: ${script}`);
+                };
+                document.head.appendChild(scriptElement);
+            });
+        }
+        
+        function testGameInitialization() {
+            if (typeof Game === 'undefined') {
+                console.error('Game class not available. Please load the main game first.');
+                return;
+            }
+            
+            try {
+                console.log('Testing game initialization...');
+                const game = new Game();
+                console.log('Game initialization successful!');
+                console.log('Game object:', game);
+            } catch (error) {
+                console.error('Game initialization failed:', error);
+            }
+        }
+        
+        // Initialize debug page
+        window.addEventListener('load', () => {
+            console.log('Debug page loaded');
+            checkEnvironment();
+            checkDependencies();
+        });
+    </script>
+</body>
+</html>
