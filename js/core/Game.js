@@ -185,9 +185,20 @@ class Game {
         // Update player stats
         this.updatePlayerStats(deltaTime);
         
-        // Update HUD with player position
+        // Update HUD with player position and biome
         const playerPos = this.player.getPosition();
         this.hud.updateCoordinates(playerPos.x, playerPos.y, playerPos.z);
+        
+        // Update biome display
+        if (this.currentPlanet) {
+            const biome = this.currentPlanet.getBiomeAt(playerPos.x, playerPos.z);
+            this.hud.updateBiome(biome);
+        }
+        
+        // Update weather display
+        if (this.weather) {
+            this.hud.updateWeather(this.weather);
+        }
     }
     
     render() {
