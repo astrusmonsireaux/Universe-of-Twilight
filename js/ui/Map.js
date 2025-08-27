@@ -1,5 +1,5 @@
 // Enhanced Map System for Veauxalia Solar System
-class Map {
+class GameMap {
     constructor() {
         this.isVisible = false;
         this.currentView = 'system'; // system, planet, local

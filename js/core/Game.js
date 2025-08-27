@@ -56,7 +56,7 @@ class Game {
         };
         
         // Event listeners
-        this.eventListeners = new Map();
+        this.eventListeners = new window.Map();
         
         this.init();
     }
@@ -117,7 +117,7 @@ class Game {
             this.hud = new HUD();
             this.menu = new Menu();
             this.crafting = new Crafting();
-            this.map = new Map();
+            this.map = new GameMap();
             
             // Connect systems
             this.connectSystems();

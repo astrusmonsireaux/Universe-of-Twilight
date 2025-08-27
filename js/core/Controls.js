@@ -33,7 +33,7 @@ class Controls {
         // Touch controls for mobile
         this.touchControls = {
             joystick: { x: 0, y: 0 },
-            buttons: new Map()
+            buttons: new window.Map()
         };
         
         // Key mappings

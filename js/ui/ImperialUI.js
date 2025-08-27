@@ -5,7 +5,7 @@ class ImperialUI {
         this.culturalSystem = null;
         this.languageSystem = null;
         this.currentView = 'main';
-        this.overlays = new Map();
+        this.overlays = {};
         
         this.init();
     }
@@ -83,7 +83,7 @@ class ImperialUI {
         `;
         
         document.body.appendChild(overlay);
-        this.overlays.set('imperial-status', overlay);
+        this.overlays['imperial-status'] = overlay;
     }
     
     createPoliticalOverlay() {
@@ -143,7 +143,7 @@ class ImperialUI {
         `;
         
         document.body.appendChild(overlay);
-        this.overlays.set('political', overlay);
+        this.overlays['political'] = overlay;
     }
     
     createCulturalOverlay() {
@@ -186,7 +186,7 @@ class ImperialUI {
         `;
         
         document.body.appendChild(overlay);
-        this.overlays.set('cultural', overlay);
+        this.overlays['cultural'] = overlay;
     }
     
     createCitizenRightsOverlay() {
@@ -219,7 +219,7 @@ class ImperialUI {
         `;
         
         document.body.appendChild(overlay);
-        this.overlays.set('citizen-rights', overlay);
+        this.overlays['citizen-rights'] = overlay;
     }
     
     createFestivalOverlay() {
@@ -243,7 +243,7 @@ class ImperialUI {
         `;
         
         document.body.appendChild(overlay);
-        this.overlays.set('festival', overlay);
+        this.overlays['festival'] = overlay;
     }
     
     setupEventListeners() {
@@ -267,7 +267,7 @@ class ImperialUI {
     }
     
     showOverlay(overlayName) {
-        const overlay = this.overlays.get(overlayName);
+        const overlay = this.overlays[overlayName];
         if (overlay) {
             overlay.classList.remove('hidden');
             this.updateOverlayContent(overlayName);
@@ -275,7 +275,7 @@ class ImperialUI {
     }
     
     hideOverlay(overlayName) {
-        const overlay = this.overlays.get(overlayName);
+        const overlay = this.overlays[overlayName];
         if (overlay) {
             overlay.classList.add('hidden');
         }
