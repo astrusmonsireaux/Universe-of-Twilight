@@ -3,8 +3,8 @@ class Scene {
     constructor() {
         this.scene = null;
         this.renderer = null;
-        this.lights = new Map();
-        this.objects = new Map();
+        this.lights = new window.Map();
+        this.objects = new window.Map();
         this.background = null;
         
         this.init();

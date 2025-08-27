@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Map Fix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .test-section {
+            background: #2a2a2a;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+    </style>
+</head>
+<body>
+    <h1>Test Map Class Fix</h1>
+    
+    <div class="test-section">
+        <h2>Map Constructor Test</h2>
+        <div id="map-test"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Game Classes Test</h2>
+        <div id="classes-test"></div>
+    </div>
+
+    <script src="js/three.min.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/GLTFLoader.js"></script>
+    
+    <script>
+        // Test 1: Check if Map constructor works
+        function testMapConstructor() {
+            const testDiv = document.getElementById('map-test');
+            
+            try {
+                const map = new Map();
+                map.set('test', 'value');
+                const value = map.get('test');
+                
+                if (value === 'value') {
+                    testDiv.innerHTML = '<span class="success">✅ Map constructor works correctly</span>';
+                } else {
+                    testDiv.innerHTML = '<span class="error">❌ Map constructor not working properly</span>';
+                }
+            } catch (error) {
+                testDiv.innerHTML = `<span class="error">❌ Map constructor failed: ${error.message}</span>`;
+            }
+        }
+        
+        // Test 2: Load game classes and test initialization
+        function testGameClasses() {
+            const testDiv = document.getElementById('classes-test');
+            testDiv.innerHTML = 'Loading game classes...';
+            
+            const scripts = [
+                'js/utils/Constants.js',
+                'js/utils/MathUtils.js',
+                'js/utils/LanguageSystem.js',
+                'js/systems/PoliticalSystem.js',
+                'js/systems/CulturalSystem.js',
+                'js/core/Game.js',
+                'js/core/Scene.js',
+                'js/core/Player.js',
+                'js/core/Camera.js',
+                'js/core/Controls.js',
+                'js/world/Planet.js',
+                'js/world/Star.js',
+                'js/world/SolarSystem.js',
+                'js/world/Terrain.js',
+                'js/world/Atmosphere.js',
+                'js/systems/Physics.js',
+                'js/systems/OrbitalMechanics.js',
+                'js/systems/Weather.js',
+                'js/ui/HUD.js',
+                'js/ui/Menu.js',
+                'js/ui/Crafting.js',
+                'js/ui/Map.js',
+                'js/ui/ImperialUI.js',
+                'js/data/PlanetData.js',
+                'js/data/StarData.js',
+                'js/data/ItemData.js'
+            ];
+            
+            let loadedCount = 0;
+            let failedCount = 0;
+            
+            scripts.forEach(script => {
+                const scriptElement = document.createElement('script');
+                scriptElement.src = script;
+                scriptElement.onload = () => {
+                    loadedCount++;
+                    if (loadedCount + failedCount === scripts.length) {
+                        testGameInitialization();
+                    }
+                };
+                scriptElement.onerror = () => {
+                    failedCount++;
+                    console.error(`Failed to load: ${script}`);
+                    if (loadedCount + failedCount === scripts.length) {
+                        testGameInitialization();
+                    }
+                };
+                document.head.appendChild(scriptElement);
+            });
+        }
+        
+        function testGameInitialization() {
+            const testDiv = document.getElementById('classes-test');
+            
+            try {
+                // Test if Game class exists
+                if (typeof Game === 'undefined') {
+                    testDiv.innerHTML = '<span class="error">❌ Game class not loaded</span>';
+                    return;
+                }
+                
+                // Test if GameMap class exists
+                if (typeof GameMap === 'undefined') {
+                    testDiv.innerHTML = '<span class="error">❌ GameMap class not loaded</span>';
+                    return;
+                }
+                
+                // Test game initialization
+                const game = new Game();
+                testDiv.innerHTML = '<span class="success">✅ Game initialization successful!</span>';
+                console.log('Game object:', game);
+                
+            } catch (error) {
+                testDiv.innerHTML = `<span class="error">❌ Game initialization failed: ${error.message}</span>`;
+                console.error('Game initialization error:', error);
+            }
+        }
+        
+        // Run tests
+        window.addEventListener('load', () => {
+            testMapConstructor();
+            testGameClasses();
+        });
+    </script>
+</body>
+</html>

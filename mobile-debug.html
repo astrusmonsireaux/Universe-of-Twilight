@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veauxalia Mobile Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 10px;
+            background: #1a1a1a;
+            color: #fff;
+            font-size: 14px;
+        }
+        .debug-section {
+            background: #2a2a2a;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 5px;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .warning { color: #ff9800; }
+        .info { color: #2196F3; }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 4px;
+            font-size: 12px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        #console-output {
+            background: #000;
+            color: #0f0;
+            padding: 8px;
+            border-radius: 5px;
+            font-family: monospace;
+            height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 11px;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-success { background: #4CAF50; }
+        .status-error { background: #f44336; }
+        .status-warning { background: #ff9800; }
+        .status-loading { background: #2196F3; animation: pulse 1s infinite; }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Veauxalia Mobile Debug</h1>
+    
+    <div class="debug-section">
+        <h3>Device Info</h3>
+        <div id="device-info"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>Three.js Loading Status</h3>
+        <div id="threejs-status">
+            <span class="status-indicator status-loading"></span>
+            <span>Loading Three.js...</span>
+        </div>
+        <button onclick="forceLoadThreeJS()">Force Load Three.js</button>
+        <button onclick="testThreeJS()">Test Three.js</button>
+    </div>
+    
+    <div class="debug-section">
+        <h3>Network Test</h3>
+        <div id="network-status"></div>
+        <button onclick="testNetwork()">Test Network</button>
+    </div>
+    
+    <div class="debug-section">
+        <h3>Console Output</h3>
+        <div id="console-output"></div>
+        <button onclick="clearConsole()">Clear</button>
+    </div>
+    
+    <div class="debug-section">
+        <h3>Quick Actions</h3>
+        <button onclick="reloadPage()">Reload Page</button>
+        <button onclick="openMainGame()">Open Main Game</button>
+        <button onclick="testAll()">Test Everything</button>
+    </div>
+
+    <script>
+        // Override console methods
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        function addToConsole(type, ...args) {
+            const output = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            const message = `[${timestamp}] ${type}: ${args.join(' ')}\n`;
+            output.textContent += message;
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToConsole('LOG', ...args);
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToConsole('ERROR', ...args);
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addToConsole('WARN', ...args);
+        };
+        
+        function clearConsole() {
+            document.getElementById('console-output').textContent = '';
+        }
+        
+        function updateDeviceInfo() {
+            const info = document.getElementById('device-info');
+            info.innerHTML = `
+                <p><strong>User Agent:</strong> ${navigator.userAgent}</p>
+                <p><strong>Platform:</strong> ${navigator.platform}</p>
+                <p><strong>Connection:</strong> ${navigator.connection ? navigator.connection.effectiveType : 'Unknown'}</p>
+                <p><strong>Memory:</strong> ${navigator.deviceMemory ? navigator.deviceMemory + 'GB' : 'Unknown'}</p>
+                <p><strong>Hardware Concurrency:</strong> ${navigator.hardwareConcurrency || 'Unknown'}</p>
+            `;
+        }
+        
+        function updateThreeJSStatus() {
+            const status = document.getElementById('threejs-status');
+            const indicator = status.querySelector('.status-indicator');
+            const text = status.querySelector('span:last-child');
+            
+            if (typeof THREE !== 'undefined') {
+                indicator.className = 'status-indicator status-success';
+                text.textContent = `Three.js loaded successfully (v${THREE.REVISION})`;
+                text.className = 'success';
+            } else {
+                indicator.className = 'status-indicator status-error';
+                text.textContent = 'Three.js not loaded';
+                text.className = 'error';
+            }
+        }
+        
+        function forceLoadThreeJS() {
+            console.log('Attempting to force load Three.js...');
+            
+            const sources = [
+                'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
+                'https://unpkg.com/three@0.128.0/build/three.min.js',
+                'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js',
+                'https://threejs.org/build/three.min.js'
+            ];
+            
+            function tryLoad(index) {
+                if (index >= sources.length) {
+                    console.error('All Three.js sources failed');
+                    return;
+                }
+                
+                console.log(`Trying source ${index + 1}: ${sources[index]}`);
+                
+                const script = document.createElement('script');
+                script.src = sources[index];
+                script.onload = function() {
+                    console.log(`Successfully loaded Three.js from: ${sources[index]}`);
+                    updateThreeJSStatus();
+                };
+                script.onerror = function() {
+                    console.warn(`Failed to load from: ${sources[index]}`);
+                    tryLoad(index + 1);
+                };
+                document.head.appendChild(script);
+            }
+            
+            tryLoad(0);
+        }
+        
+        function testThreeJS() {
+            if (typeof THREE === 'undefined') {
+                console.error('Three.js is not loaded');
+                return;
+            }
+            
+            try {
+                console.log('Testing Three.js functionality...');
+                
+                // Test basic Three.js objects
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ antialias: true });
+                
+                renderer.setSize(100, 100);
+                document.body.appendChild(renderer.domElement);
+                
+                const geometry = new THREE.BoxGeometry();
+                const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+                const cube = new THREE.Mesh(geometry, material);
+                scene.add(cube);
+                
+                camera.position.z = 5;
+                
+                function animate() {
+                    requestAnimationFrame(animate);
+                    cube.rotation.x += 0.01;
+                    cube.rotation.y += 0.01;
+                    renderer.render(scene, camera);
+                }
+                
+                animate();
+                
+                console.log('Three.js test successful!');
+                
+                // Remove test renderer after 2 seconds
+                setTimeout(() => {
+                    if (renderer.domElement.parentNode) {
+                        document.body.removeChild(renderer.domElement);
+                    }
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Three.js test failed:', error);
+            }
+        }
+        
+        function testNetwork() {
+            const status = document.getElementById('network-status');
+            status.innerHTML = '<span class="status-indicator status-loading"></span> Testing network...';
+            
+            // Test multiple CDN endpoints
+            const testUrls = [
+                'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
+                'https://unpkg.com/three@0.128.0/build/three.min.js',
+                'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js'
+            ];
+            
+            let results = [];
+            let completed = 0;
+            
+            testUrls.forEach((url, index) => {
+                const startTime = performance.now();
+                fetch(url, { method: 'HEAD' })
+                    .then(response => {
+                        const endTime = performance.now();
+                        const duration = Math.round(endTime - startTime);
+                        results[index] = { url, success: true, duration };
+                        completed++;
+                        checkComplete();
+                    })
+                    .catch(error => {
+                        results[index] = { url, success: false, error: error.message };
+                        completed++;
+                        checkComplete();
+                    });
+            });
+            
+            function checkComplete() {
+                if (completed === testUrls.length) {
+                    let html = '';
+                    results.forEach(result => {
+                        if (result.success) {
+                            html += `<p><span class="status-indicator status-success"></span> ${result.url} (${result.duration}ms)</p>`;
+                        } else {
+                            html += `<p><span class="status-indicator status-error"></span> ${result.url} (Failed: ${result.error})</p>`;
+                        }
+                    });
+                    status.innerHTML = html;
+                }
+            }
+        }
+        
+        function reloadPage() {
+            location.reload();
+        }
+        
+        function openMainGame() {
+            window.location.href = 'index.html';
+        }
+        
+        function testAll() {
+            console.log('Running comprehensive tests...');
+            updateDeviceInfo();
+            updateThreeJSStatus();
+            testNetwork();
+            testThreeJS();
+        }
+        
+        // Initialize
+        window.addEventListener('load', () => {
+            console.log('Mobile debug page loaded');
+            updateDeviceInfo();
+            
+            // Check Three.js status periodically
+            const checkInterval = setInterval(() => {
+                updateThreeJSStatus();
+                if (typeof THREE !== 'undefined') {
+                    clearInterval(checkInterval);
+                }
+            }, 1000);
+            
+            // Stop checking after 30 seconds
+            setTimeout(() => {
+                clearInterval(checkInterval);
+            }, 30000);
+        });
+    </script>
+</body>
+</html>

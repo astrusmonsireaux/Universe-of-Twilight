@@ -5,10 +5,13 @@ let game = null;
 const loadingProgress = document.getElementById('loading-progress');
 const loadingText = document.getElementById('loading-text');
 
-function updateLoadingProgress(progress, text) {
+function updateLoadingProgress(progress, text, details = '') {
     loadingProgress.style.width = `${progress}%`;
     if (text) {
         loadingText.textContent = text;
+    }
+    if (details) {
+        document.getElementById('loading-details').textContent = details;
     }
 }
 
@@ -17,28 +20,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         console.log('Starting Veauxalia game initialization...');
         
+        // Set a timeout for initialization
+        const initTimeout = setTimeout(() => {
+            showError('Game initialization timed out. Please refresh the page and try again.');
+        }, 30000); // 30 second timeout
+        
+        // Check if Three.js is available
+        if (typeof THREE === 'undefined') {
+            throw new Error('Three.js library not loaded. Please refresh the page.');
+        }
+        
         // Update loading progress
-        updateLoadingProgress(10, 'Loading game engine...');
+        updateLoadingProgress(10, 'Loading game engine...', 'Checking dependencies...');
         
         // Wait a bit for visual feedback
         await new Promise(resolve => setTimeout(resolve, 500));
         
-        updateLoadingProgress(20, 'Initializing 3D scene...');
+        updateLoadingProgress(20, 'Initializing 3D scene...', 'Setting up WebGL renderer...');
         await new Promise(resolve => setTimeout(resolve, 300));
         
-        updateLoadingProgress(40, 'Loading solar system data...');
+        updateLoadingProgress(40, 'Loading solar system data...', 'Loading planet and star data...');
         await new Promise(resolve => setTimeout(resolve, 400));
         
-        updateLoadingProgress(60, 'Generating world terrain...');
+        updateLoadingProgress(60, 'Generating world terrain...', 'Creating procedural landscapes...');
         await new Promise(resolve => setTimeout(resolve, 600));
         
-        updateLoadingProgress(80, 'Setting up user interface...');
+        updateLoadingProgress(80, 'Setting up user interface...', 'Initializing HUD and menus...');
         await new Promise(resolve => setTimeout(resolve, 300));
         
-        updateLoadingProgress(90, 'Finalizing initialization...');
+        updateLoadingProgress(90, 'Finalizing initialization...', 'Connecting game systems...');
         await new Promise(resolve => setTimeout(resolve, 200));
         
-        updateLoadingProgress(100, 'Ready to explore Veauxalia!');
+        updateLoadingProgress(100, 'Ready to explore Veauxalia!', 'Press any key to begin your journey...');
         await new Promise(resolve => setTimeout(resolve, 500));
         
         // Create and start the game
@@ -47,11 +60,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Make game globally accessible for debugging
         window.game = game;
         
+        // Clear the timeout since initialization succeeded
+        clearTimeout(initTimeout);
+        
         console.log('Veauxalia game ready!');
         
     } catch (error) {
         console.error('Failed to initialize game:', error);
-        showError('Failed to initialize game. Please check your browser console for details.');
+        showError(`Failed to initialize game: ${error.message}. Please refresh the page.`);
     }
 });
 
@@ -159,12 +175,15 @@ if (!checkWebGLSupport()) {
 // Service Worker for offline support (optional)
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
+        // Use relative path for GitHub Pages
+        const swPath = window.location.hostname === 'github.io' ? './sw.js' : '/sw.js';
+        navigator.serviceWorker.register(swPath)
             .then(registration => {
                 console.log('ServiceWorker registration successful');
             })
             .catch(error => {
                 console.log('ServiceWorker registration failed:', error);
+                // Don't show error for service worker - it's optional
             });
     });
 }

@@ -6,9 +6,54 @@
     <title>Veauxalia: Universe of Twilight</title>
     <link rel="stylesheet" href="styles/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <!-- Local Three.js libraries -->
+    <script src="js/three.min.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/GLTFLoader.js"></script>
+    <script>
+        // Check if Three.js loaded properly
+        window.addEventListener('load', function() {
+            if (typeof THREE === 'undefined') {
+                console.error('Three.js failed to load');
+                showError('Three.js library failed to load. Please refresh the page.');
+            } else {
+                console.log('Three.js loaded successfully (v' + THREE.REVISION + ')');
+            }
+        });
+        
+        // Global error handler
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(255, 0, 0, 0.9);
+                color: white;
+                padding: 20px;
+                border-radius: 10px;
+                z-index: 10000;
+                font-family: Arial, sans-serif;
+                text-align: center;
+                max-width: 400px;
+            `;
+            errorDiv.innerHTML = `
+                <h3>Initialization Error</h3>
+                <p>${message}</p>
+                <button onclick="location.reload()" style="
+                    background: white;
+                    color: red;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    margin-top: 10px;
+                ">Refresh Page</button>
+            `;
+            document.body.appendChild(errorDiv);
+        }
+    </script>
 </head>
 <body>
     <!-- Loading Screen -->
@@ -20,6 +65,7 @@
                 <div class="loading-progress" id="loading-progress"></div>
             </div>
             <p class="loading-text" id="loading-text">Initializing universe...</p>
+            <p class="loading-details" id="loading-details" style="font-size: 12px; color: #888; margin-top: 10px;"></p>
         </div>
     </div>
 

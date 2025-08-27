@@ -56,7 +56,7 @@ class Game {
         };
         
         // Event listeners
-        this.eventListeners = new Map();
+        this.eventListeners = new window.Map();
         
         this.init();
     }
@@ -64,6 +64,32 @@ class Game {
     async init() {
         try {
             console.log('Initializing Veauxalia game...');
+            
+            // Check if required classes are available
+            if (typeof LanguageSystem === 'undefined') {
+                throw new Error('LanguageSystem not loaded');
+            }
+            if (typeof PoliticalSystem === 'undefined') {
+                throw new Error('PoliticalSystem not loaded');
+            }
+            if (typeof CulturalSystem === 'undefined') {
+                throw new Error('CulturalSystem not loaded');
+            }
+            if (typeof Scene === 'undefined') {
+                throw new Error('Scene not loaded');
+            }
+            if (typeof Player === 'undefined') {
+                throw new Error('Player not loaded');
+            }
+            if (typeof Camera === 'undefined') {
+                throw new Error('Camera not loaded');
+            }
+            if (typeof Controls === 'undefined') {
+                throw new Error('Controls not loaded');
+            }
+            if (typeof Planet === 'undefined') {
+                throw new Error('Planet not loaded');
+            }
             
             // Initialize language system first
             this.languageSystem = new LanguageSystem();
@@ -91,7 +117,7 @@ class Game {
             this.hud = new HUD();
             this.menu = new Menu();
             this.crafting = new Crafting();
-            this.map = new Map();
+            this.map = new GameMap();
             
             // Connect systems
             this.connectSystems();
