@@ -1,85 +1,283 @@
 # Veauxalia: Universe of Twilight
 
-A 3D survival, adventure, sci-fi, and fantasy game set in the Veauxalia solar system, featuring the unique world of Chimera and the Homo Kaylex species.
+A 3D survival, adventure, sci-fi, and fantasy game set in the Veauxalia universe, featuring the Homo Kaylex species and a binary star system.
 
-## 🌟 Game Overview
+## 🌟 Overview
 
-**Veauxalia** is an immersive 3D space exploration and survival game where players navigate a binary star system with multiple habitable worlds. Based on Universe Sandbox, WorldBox, and Minecraft mechanics, players can explore planets, survive in diverse environments, and experience the rich lore of the Veauxalia universe.
+Veauxalia is an immersive 3D game that combines elements of Universe Sandbox, WorldBox, and Minecraft. Players take on the role of a Homo Kaylex, a unique species with photosynthetic skin and special abilities, exploring a procedurally generated universe with a binary star system.
 
-## 🎮 Features
+## 🎮 Core Features
 
-### Solar System
-- **Binary Star System**: Hieleon (G2V) and Nyxeon (K5V) stars
-- **Multiple Habitable Worlds**: Explore Neflaym, Elisium, and Chimera
-- **Realistic Orbital Mechanics**: Planets orbit both stars with complex gravitational interactions
-- **Diverse Planetary Environments**: From rocky worlds to gas giants
+### Binary Star System
+- **Hieleon** (G2V star) - Primary star with habitable zone
+- **Nyxeon** (K5V star) - Secondary star with unique orbital mechanics
+- Dynamic orbital calculations and realistic stellar interactions
 
-### Gameplay
-- **Survival Mechanics**: Resource gathering, crafting, and environmental challenges
-- **Space Exploration**: Travel between planets and moons
-- **Building & Construction**: Create bases and structures on different worlds
-- **Character Development**: Play as Homo Kaylex with unique biological traits
-- **Multi-planetary Civilization**: Experience the United Empire of Gauletria
+### Multiple Planets
+- **Chimera** - Homeworld of Homo Kaylex with diverse biomes
+- **Neflaym** - Temperate world with Earth-like conditions
+- **Elisium** - Forest world orbiting Nyxeon
+- **Baylephon, Dimetrian, Sufreign** - Gas giants with unique atmospheres
+- **Areon, Gallian, Lagnia** - Ice dwarf planets in the outer system
 
-### Technical Features
-- **Web-based**: Compatible with GitHub Pages
-- **3D Graphics**: Powered by Three.js for immersive visuals
-- **Mobile Responsive**: Android-compatible design
-- **Procedural Generation**: Dynamic world creation
-- **Real-time Physics**: Accurate orbital and gravitational simulations
+### Homo Kaylex Species
+- **Photosynthetic Skin** - Regenerate energy from sunlight
+- **Enhanced Vision** - See in various light conditions
+- **Telepathy** - Unlockable ability for communication
+- **Time Perception** - Unlockable ability for temporal awareness
+- **Hermaphroditic** - All individuals can reproduce
+- **Truth-Telling** - Biologically incapable of lying
+
+### Enhanced Gameplay Mechanics
+- **Energy Management** - Balance energy consumption and photosynthesis
+- **Health System** - Monitor and maintain health through various means
+- **Movement Abilities** - Walk, run, sprint, crouch, jump, and fly
+- **Terrain Interaction** - Realistic collision and height-based movement
+- **Biome System** - Diverse environments with unique characteristics
+
+### Advanced Terrain Generation
+- **Procedural Worlds** - Each planet has unique terrain generation
+- **Multiple Biomes** - Ocean, beach, desert, grassland, forest, mountain, tundra, arctic, volcanic, swamp, tropical, savanna, taiga, alpine
+- **Height Maps** - Realistic elevation with multiple noise octaves
+- **Moisture & Temperature** - Dynamic climate simulation
+- **Planet-Specific Features** - Continental features, craters, gas atmospheres
+
+## 🎯 Gameplay
+
+### Controls
+- **WASD** - Movement
+- **Mouse** - Look around
+- **Space** - Jump
+- **Shift** - Run/Sprint
+- **Ctrl** - Crouch
+- **F** - Toggle flight mode
+- **E** - Interact
+- **C** - Crafting menu
+- **M** - Map
+- **I** - Inventory
+- **T** - Telepathy ability
+- **Y** - Time perception ability
+- **V** - Enhanced vision toggle
+
+### Homo Kaylex Abilities
+1. **Photosynthesis** (Always Active)
+   - Regenerate energy from sunlight
+   - Visual glow effect based on light exposure
+   - Energy bonus during daylight hours
+
+2. **Enhanced Vision** (Always Active)
+   - Improved visibility in various conditions
+   - Better color perception
+   - Night vision capabilities
+
+3. **Telepathy** (Unlockable)
+   - Communicate with other entities
+   - Sense nearby life forms
+   - Energy cost: 30 units
+
+4. **Time Perception** (Unlockable)
+   - Slow down perceived time
+   - Enhanced reaction speed
+   - Energy cost: 50 units
+
+### Energy System
+- **Base Regeneration** - Natural energy recovery
+- **Photosynthesis Bonus** - Enhanced regeneration in sunlight
+- **Consumption** - Activities consume energy
+- **Low Energy Warnings** - Visual and audio alerts
+
+### Health System
+- **Regeneration** - Automatic healing when energy is sufficient
+- **Damage Sources** - Environmental hazards, falls, etc.
+- **Healing Items** - Collect and use healing resources
+- **Low Health Warnings** - Visual and audio alerts
+
+## 🛠️ Technical Features
+
+### 3D Graphics
+- **Three.js** - WebGL-based 3D rendering
+- **Realistic Lighting** - Dynamic shadows and atmospheric effects
+- **Procedural Materials** - Biome-based terrain coloring
+- **Particle Systems** - Atmospheric and environmental effects
+
+### Physics Engine
+- **Gravity Simulation** - Planet-specific gravitational forces
+- **Collision Detection** - Realistic terrain interaction
+- **Orbital Mechanics** - Accurate celestial body movements
+- **Fluid Dynamics** - Basic water and atmospheric simulation
+
+### World Generation
+- **Perlin Noise** - Natural-looking terrain generation
+- **Multiple Octaves** - Detailed height variations
+- **Biome Mapping** - Climate-based environment distribution
+- **Chunk Loading** - Efficient world rendering
+
+### User Interface
+- **Enhanced HUD** - Real-time player status and abilities
+- **Ability Indicators** - Visual representation of available powers
+- **Photosynthesis Monitor** - Sunlight exposure and energy bonus
+- **Interactive Inventory** - Drag-and-drop item management
+- **System Map** - Interactive solar system navigation
 
 ## 🚀 Quick Start
 
-1. Clone this repository
-2. Open `index.html` in a modern web browser
-3. Begin your journey in the Veauxalia universe!
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/veauxalia.git
+   cd veauxalia
+   ```
 
-## 🌍 World Details
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-### Chimera (Main World)
-- **Type**: Earth-like rock planet
-- **Size**: 1.2 Earth radii, 1.5 Earth masses
-- **Moons**: Venairum and Hybros
-- **Environment**: Ten continents with diverse biomes
-- **Civilization**: United Empire of Gauletria
+3. **Start local development server**
+   ```bash
+   npm start
+   ```
 
-### Key Planets
-- **Neflaym**: Earth-sized world with moon Looneet
-- **Elisium**: Rocky planet orbiting Nyxeon
-- **Baylephon**: Gas giant with 4 moons
-- **Dimetrian & Sufreign**: Large gas planets
+4. **Open in browser**
+   Navigate to `http://localhost:8000`
 
-## 👥 Species: Homo Kaylex
+## 📱 Mobile Support
 
-- **Origin**: Chimera
-- **Lifespan**: 0-250 years
-- **Biology**: Photosynthetic humanoids with purple/violet skin
-- **Reproduction**: Hermaphroditic (asexual/sexual)
-- **Special Traits**: Biologically incapable of lying
-- **Technology**: Type 1 Civilization
+- **Touch Controls** - Virtual joystick and action buttons
+- **Responsive Design** - Optimized for various screen sizes
+- **Mobile UI** - Touch-friendly interface elements
+- **Performance Optimization** - Reduced graphics for mobile devices
 
-## 🛠️ Development
+## 🎨 Customization
 
-This game is built using:
-- **Three.js**: 3D graphics and physics
-- **JavaScript**: Game logic and mechanics
-- **HTML5/CSS3**: User interface
-- **WebGL**: Hardware-accelerated rendering
+### Graphics Settings
+- **Low** - Basic lighting, reduced shadows
+- **Medium** - Standard quality (default)
+- **High** - Enhanced lighting and effects
+- **Ultra** - Maximum quality with all features
 
-## 📱 Compatibility
+### Audio Settings
+- **Sound Volume** - Environmental and interaction sounds
+- **Music Volume** - Background atmospheric music
+- **Master Volume** - Overall audio level
 
-- ✅ Modern web browsers
-- ✅ Android devices
-- ✅ GitHub Pages hosting
-- ✅ Mobile-responsive design
+### Controls
+- **Mouse Sensitivity** - Adjustable look sensitivity
+- **Key Bindings** - Customizable control scheme
+- **Touch Sensitivity** - Mobile control responsiveness
 
-## 🎯 Game Modes
+## 🌍 Lore Integration
 
-1. **Survival Mode**: Survive in the harsh environments of Veauxalia
-2. **Creative Mode**: Build and explore without resource constraints
-3. **Adventure Mode**: Follow storylines and quests
-4. **Sandbox Mode**: Experiment with planetary physics
+### United Empire of Gauletria
+- **Imperial Elastic Democracy** - Unique political system
+- **Gaulsais Language** - Official language of the empire
+- **Type 1 Civilization** - Advanced technological development
+- **Atheistic Society** - No religious institutions
+
+### Veauxalia Time System
+- **500-day years** - Extended annual cycles
+- **26-hour days** - Longer daily periods
+- **20 months** - Primus through Vicesimus
+- **5-day weeks** - Unique weekly structure
+
+## 🔧 Development
+
+### Project Structure
+```
+veauxalia/
+├── index.html              # Main game entry point
+├── styles/
+│   └── main.css           # Game styling
+├── js/
+│   ├── main.js            # Game initialization
+│   ├── core/              # Core game systems
+│   │   ├── Game.js        # Main game engine
+│   │   ├── Scene.js       # 3D scene management
+│   │   ├── Player.js      # Homo Kaylex player
+│   │   ├── Camera.js      # Camera controls
+│   │   └── Controls.js    # Input handling
+│   ├── world/             # World generation
+│   │   ├── Planet.js      # Planet management
+│   │   ├── Terrain.js     # Terrain generation
+│   │   ├── Atmosphere.js  # Atmospheric effects
+│   │   ├── SolarSystem.js # Solar system simulation
+│   │   └── Star.js        # Star rendering
+│   ├── systems/           # Game systems
+│   │   ├── Physics.js     # Physics simulation
+│   │   ├── Weather.js     # Weather system
+│   │   └── OrbitalMechanics.js # Orbital calculations
+│   ├── ui/                # User interface
+│   │   ├── HUD.js         # Heads-up display
+│   │   ├── Menu.js        # Game menus
+│   │   ├── Crafting.js    # Crafting interface
+│   │   └── Map.js         # System map
+│   ├── data/              # Game data
+│   │   ├── ItemData.js    # Item definitions
+│   │   ├── PlanetData.js  # Planet information
+│   │   └── StarData.js    # Star information
+│   └── utils/             # Utilities
+│       ├── Constants.js   # Game constants
+│       └── MathUtils.js   # Mathematical functions
+├── package.json           # Project configuration
+├── sw.js                  # Service worker
+└── README.md             # This file
+```
+
+### Key Technologies
+- **Three.js** - 3D graphics and rendering
+- **WebGL** - Hardware-accelerated graphics
+- **JavaScript ES6+** - Modern JavaScript features
+- **HTML5** - Game container and UI
+- **CSS3** - Styling and animations
+- **Service Workers** - Offline support
+
+## 🎯 Future Enhancements
+
+### Planned Features
+- **Multiplayer Support** - Cooperative and competitive gameplay
+- **Advanced Crafting** - Complex item creation system
+- **Quest System** - Story-driven objectives
+- **NPCs** - Non-player characters with AI
+- **Space Travel** - Interplanetary exploration
+- **Base Building** - Construct and customize bases
+- **Advanced Combat** - Weapon and armor systems
+- **Weather Events** - Dynamic atmospheric phenomena
+
+### Technical Improvements
+- **WebAssembly** - Performance optimization
+- **WebXR** - Virtual reality support
+- **Progressive Web App** - Enhanced mobile experience
+- **Cloud Save** - Cross-device synchronization
+- **Modding Support** - User-created content
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+
+### Development Setup
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **Three.js Community** - 3D graphics library
+- **Veauxalia Universe Creators** - Original lore and concepts
+- **Open Source Contributors** - Various libraries and tools
+- **Beta Testers** - Feedback and bug reports
+
+## 📞 Support
+
+- **Issues** - Report bugs on GitHub Issues
+- **Discussions** - Join community discussions
+- **Documentation** - Check the wiki for detailed guides
+- **Discord** - Join our community server
 
 ---
 
-*Explore the universe of Veauxalia and discover the secrets of the binary star system!*
+**Explore the Veauxalia universe and discover the secrets of the Homo Kaylex!** 🌟

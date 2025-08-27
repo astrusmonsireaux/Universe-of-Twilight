@@ -197,9 +197,7 @@ class Game {
         this.solarSystem.update(deltaTime);
         
         // Update orbital mechanics
-        if (this.orbitalMechanics) {
-            this.orbitalMechanics.update(deltaTime);
-        }
+        this.orbitalMechanics.update(deltaTime);
         
         // Update UI
         this.hud.update(deltaTime);
@@ -207,28 +205,15 @@ class Game {
         // Update player stats
         this.updatePlayerStats(deltaTime);
         
-        // Update HUD with player position and biome
+        // Update HUD with player position
         const playerPos = this.player.getPosition();
         this.hud.updateCoordinates(playerPos.x, playerPos.y, playerPos.z);
-        
-        // Update biome display
-        if (this.currentPlanet) {
-            const biome = this.currentPlanet.getBiomeAt(playerPos.x, playerPos.z);
-            this.hud.updateBiome(biome);
-        }
-        
-        // Update weather display
-        if (this.weather) {
-            this.hud.updateWeather(this.weather.getWeatherData());
-        }
         
         // Handle player interactions
         this.handlePlayerInteractions();
         
-        // Update atmospheric effects
-        if (this.currentPlanet && this.currentPlanet.atmosphere) {
-            this.currentPlanet.atmosphere.update(deltaTime);
-        }
+        // Check for warnings
+        this.checkPlayerWarnings();
     }
     
     render() {
@@ -272,21 +257,37 @@ class Game {
     }
     
     updatePlayerStats(deltaTime) {
-        // Energy regeneration (photosynthesis)
-        if (this.playerData.energy < GAME_CONSTANTS.MAX_ENERGY) {
-            this.playerData.energy += GAME_CONSTANTS.ENERGY_REGEN_RATE * deltaTime;
-            this.playerData.energy = Math.min(this.playerData.energy, GAME_CONSTANTS.MAX_ENERGY);
+        // Update player data for save/load
+        this.playerData.health = this.player.getHealth();
+        this.playerData.energy = this.player.getEnergy();
+        this.playerData.position = this.player.getPosition();
+        this.playerData.rotation = this.player.rotation;
+        
+        // Update HUD with current stats
+        this.hud.updateHealthBar();
+        this.hud.updateEnergyBar();
+        this.hud.updateAbilityIndicators();
+        this.hud.updatePhotosynthesisStatus();
+    }
+    
+    checkPlayerWarnings() {
+        const player = this.player;
+        
+        // Check for low energy warning
+        if (player.getEnergy() < 20 && !this.energyWarningShown) {
+            this.hud.showEnergyWarning();
+            this.energyWarningShown = true;
+        } else if (player.getEnergy() > 30) {
+            this.energyWarningShown = false;
         }
         
-        // Health regeneration
-        if (this.playerData.health < GAME_CONSTANTS.MAX_HEALTH) {
-            this.playerData.health += GAME_CONSTANTS.HEALTH_REGEN_RATE * deltaTime;
-            this.playerData.health = Math.min(this.playerData.health, GAME_CONSTANTS.MAX_HEALTH);
+        // Check for low health warning
+        if (player.getHealth() < 30 && !this.healthWarningShown) {
+            this.hud.showHealthWarning();
+            this.healthWarningShown = true;
+        } else if (player.getHealth() > 50) {
+            this.healthWarningShown = false;
         }
-        
-        // Update HUD
-        this.hud.updateHealth(this.playerData.health);
-        this.hud.updateEnergy(this.playerData.energy);
     }
     
     setupEventListeners() {
@@ -644,17 +645,19 @@ class Game {
         document.body.appendChild(errorDiv);
     }
     
-    // Save/Load functionality
+    // Enhanced save/load with abilities
     saveGame() {
         const saveData = {
             playerData: this.playerData,
             currentLocation: this.currentLocation,
             gameTime: this.gameTime,
-            settings: this.settings
+            settings: this.settings,
+            playerAbilities: this.player.abilities,
+            unlockedAbilities: Object.keys(this.player.abilities).filter(key => this.player.abilities[key])
         };
         
         localStorage.setItem('veauxalia_save', JSON.stringify(saveData));
-        console.log('Game saved!');
+        console.log('Game saved with abilities!');
     }
     
     loadGame() {
@@ -666,10 +669,15 @@ class Game {
             this.gameTime = data.gameTime;
             this.settings = data.settings;
             
+            // Restore player abilities
+            if (data.playerAbilities) {
+                this.player.abilities = data.playerAbilities;
+            }
+            
             // Reload current planet
             this.loadPlanet(this.currentLocation);
             
-            console.log('Game loaded!');
+            console.log('Game loaded with abilities!');
             return true;
         }
         return false;
@@ -689,6 +697,20 @@ class Game {
         // Handle map
         if (this.controls.map) {
             this.map.show();
+        }
+        
+        // Handle inventory
+        if (this.controls.inventory) {
+            this.toggleInventory();
+        }
+        
+        // Handle ability usage
+        if (this.controls.telepathy) {
+            this.player.useAbility('telepathy');
+        }
+        
+        if (this.controls.timePerception) {
+            this.player.useAbility('timePerception');
         }
     }
     
@@ -719,6 +741,22 @@ class Game {
                 }
             });
         }
+    }
+
+    toggleInventory() {
+        // Toggle inventory visibility
+        const inventory = document.getElementById('inventory');
+        if (inventory) {
+            inventory.classList.toggle('expanded');
+        }
+    }
+
+    unlockPlayerAbility(abilityName) {
+        if (this.player.unlockAbility(abilityName)) {
+            this.hud.showAbilityUnlocked(abilityName);
+            return true;
+        }
+        return false;
     }
 
     connectSystems() {

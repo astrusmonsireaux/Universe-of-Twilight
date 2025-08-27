@@ -1,33 +1,60 @@
-// Controls management for Veauxalia
+// Enhanced Controls for Homo Kaylex
 class Controls {
     constructor() {
+        // Movement controls
         this.forward = false;
         this.backward = false;
         this.left = false;
         this.right = false;
         this.jump = false;
         this.run = false;
+        this.sprint = false;
+        this.crouch = false;
+        this.fly = false;
+        
+        // Interaction controls
         this.interact = false;
-        this.drop = false;
         this.craft = false;
         this.map = false;
+        this.inventory = false;
+        
+        // Homo Kaylex ability controls
+        this.telepathy = false;
+        this.timePerception = false;
+        this.enhancedVision = false;
         
         // Mouse controls
         this.mouseX = 0;
         this.mouseY = 0;
         this.mouseDeltaX = 0;
         this.mouseDeltaY = 0;
-        this.mouseSensitivity = 1.0;
+        this.isPointerLocked = false;
         
         // Touch controls for mobile
-        this.touchStartX = 0;
-        this.touchStartY = 0;
-        this.touchMoveX = 0;
-        this.touchMoveY = 0;
-        this.isTouching = false;
+        this.touchControls = {
+            joystick: { x: 0, y: 0 },
+            buttons: new Map()
+        };
         
-        // Pointer lock
-        this.isPointerLocked = false;
+        // Key mappings
+        this.keyMap = {
+            'KeyW': 'forward',
+            'KeyS': 'backward',
+            'KeyA': 'left',
+            'KeyD': 'right',
+            'Space': 'jump',
+            'ShiftLeft': 'run',
+            'ShiftRight': 'sprint',
+            'ControlLeft': 'crouch',
+            'KeyF': 'fly',
+            'KeyE': 'interact',
+            'KeyC': 'craft',
+            'KeyM': 'map',
+            'KeyI': 'inventory',
+            'KeyT': 'telepathy',
+            'KeyY': 'timePerception',
+            'KeyV': 'enhancedVision'
+        };
         
         this.init();
     }
@@ -38,45 +65,255 @@ class Controls {
         this.setupTouchControls();
         this.setupPointerLock();
         
-        console.log('Controls initialized');
+        console.log('Enhanced controls initialized');
     }
     
     setupKeyboardControls() {
         document.addEventListener('keydown', (event) => {
-            this.handleKeyDown(event);
+            const action = this.keyMap[event.code];
+            if (action) {
+                event.preventDefault();
+                this[action] = true;
+                
+                // Handle toggle actions
+                if (['run', 'sprint', 'crouch', 'fly', 'enhancedVision'].includes(action)) {
+                    if (window.game && window.game.player) {
+                        switch (action) {
+                            case 'run':
+                                window.game.player.toggleRun();
+                                break;
+                            case 'sprint':
+                                window.game.player.toggleSprint();
+                                break;
+                            case 'crouch':
+                                window.game.player.toggleCrouch();
+                                break;
+                            case 'fly':
+                                window.game.player.toggleFly();
+                                break;
+                        }
+                    }
+                }
+            }
         });
         
         document.addEventListener('keyup', (event) => {
-            this.handleKeyUp(event);
+            const action = this.keyMap[event.code];
+            if (action) {
+                event.preventDefault();
+                this[action] = false;
+            }
         });
     }
     
     setupMouseControls() {
         document.addEventListener('mousemove', (event) => {
-            this.handleMouseMove(event);
+            if (this.isPointerLocked) {
+                this.mouseDeltaX = event.movementX || 0;
+                this.mouseDeltaY = event.movementY || 0;
+                this.mouseX += this.mouseDeltaX;
+                this.mouseY += this.mouseDeltaY;
+                
+                // Clamp mouse Y to prevent over-rotation
+                this.mouseY = Math.max(-90, Math.min(90, this.mouseY));
+            }
         });
         
-        document.addEventListener('mousedown', (event) => {
-            this.handleMouseDown(event);
-        });
-        
-        document.addEventListener('mouseup', (event) => {
-            this.handleMouseUp(event);
+        document.addEventListener('click', () => {
+            if (!this.isPointerLocked) {
+                this.requestPointerLock();
+            }
         });
     }
     
     setupTouchControls() {
+        if (!this.isMobile()) return;
+        
+        // Create touch UI elements
+        this.createTouchUI();
+        
+        // Touch event handlers
         document.addEventListener('touchstart', (event) => {
+            event.preventDefault();
             this.handleTouchStart(event);
         });
         
         document.addEventListener('touchmove', (event) => {
+            event.preventDefault();
             this.handleTouchMove(event);
         });
         
         document.addEventListener('touchend', (event) => {
+            event.preventDefault();
             this.handleTouchEnd(event);
         });
+    }
+    
+    createTouchUI() {
+        const touchUI = document.createElement('div');
+        touchUI.id = 'touch-ui';
+        touchUI.className = 'touch-ui';
+        touchUI.innerHTML = `
+            <div class="joystick-area">
+                <div class="joystick" id="joystick">
+                    <div class="joystick-thumb" id="joystick-thumb"></div>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button class="action-btn" id="jump-btn">Jump</button>
+                <button class="action-btn" id="interact-btn">Interact</button>
+                <button class="action-btn" id="menu-btn">Menu</button>
+                <button class="action-btn" id="ability-btn">Ability</button>
+            </div>
+        `;
+        
+        document.body.appendChild(touchUI);
+        
+        // Add touch UI styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .touch-ui {
+                position: fixed;
+                bottom: 20px;
+                left: 20px;
+                z-index: 1000;
+                display: flex;
+                gap: 20px;
+            }
+            
+            .joystick-area {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .joystick {
+                width: 100%;
+                height: 100%;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                border-radius: 50%;
+                position: relative;
+                background: rgba(0, 0, 0, 0.2);
+            }
+            
+            .joystick-thumb {
+                width: 40px;
+                height: 40px;
+                background: rgba(255, 255, 255, 0.8);
+                border-radius: 50%;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                pointer-events: none;
+            }
+            
+            .action-buttons {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .action-btn {
+                width: 60px;
+                height: 60px;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                border-radius: 50%;
+                background: rgba(0, 0, 0, 0.2);
+                color: white;
+                font-size: 12px;
+                cursor: pointer;
+            }
+            
+            .action-btn:active {
+                background: rgba(255, 255, 255, 0.2);
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    handleTouchStart(event) {
+        for (const touch of event.touches) {
+            const element = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+            if (element.id === 'joystick') {
+                this.touchControls.joystick.active = true;
+                this.touchControls.joystick.startX = touch.clientX;
+                this.touchControls.joystick.startY = touch.clientY;
+            } else if (element.id === 'jump-btn') {
+                this.jump = true;
+            } else if (element.id === 'interact-btn') {
+                this.interact = true;
+            } else if (element.id === 'menu-btn') {
+                if (window.game) {
+                    window.game.pause();
+                }
+            } else if (element.id === 'ability-btn') {
+                this.telepathy = true;
+            }
+        }
+    }
+    
+    handleTouchMove(event) {
+        for (const touch of event.touches) {
+            const element = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+            if (element.id === 'joystick' && this.touchControls.joystick.active) {
+                const joystick = document.getElementById('joystick');
+                const rect = joystick.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                const deltaX = touch.clientX - centerX;
+                const deltaY = touch.clientY - centerY;
+                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                const maxDistance = rect.width / 2 - 20;
+                
+                if (distance > maxDistance) {
+                    const angle = Math.atan2(deltaY, deltaX);
+                    const x = Math.cos(angle) * maxDistance;
+                    const y = Math.sin(angle) * maxDistance;
+                    this.touchControls.joystick.x = x / maxDistance;
+                    this.touchControls.joystick.y = y / maxDistance;
+                } else {
+                    this.touchControls.joystick.x = deltaX / maxDistance;
+                    this.touchControls.joystick.y = deltaY / maxDistance;
+                }
+                
+                // Update joystick visual
+                const thumb = document.getElementById('joystick-thumb');
+                thumb.style.left = `${50 + this.touchControls.joystick.x * 50}%`;
+                thumb.style.top = `${50 + this.touchControls.joystick.y * 50}%`;
+                
+                // Update movement controls
+                this.forward = this.touchControls.joystick.y < -0.3;
+                this.backward = this.touchControls.joystick.y > 0.3;
+                this.left = this.touchControls.joystick.x < -0.3;
+                this.right = this.touchControls.joystick.x > 0.3;
+            }
+        }
+    }
+    
+    handleTouchEnd(event) {
+        // Reset joystick
+        this.touchControls.joystick.active = false;
+        this.touchControls.joystick.x = 0;
+        this.touchControls.joystick.y = 0;
+        
+        // Reset joystick visual
+        const thumb = document.getElementById('joystick-thumb');
+        if (thumb) {
+            thumb.style.left = '50%';
+            thumb.style.top = '50%';
+        }
+        
+        // Reset movement controls
+        this.forward = false;
+        this.backward = false;
+        this.left = false;
+        this.right = false;
+        this.jump = false;
+        this.interact = false;
+        this.telepathy = false;
     }
     
     setupPointerLock() {
@@ -84,242 +321,64 @@ class Controls {
             this.isPointerLocked = document.pointerLockElement !== null;
         });
         
-        document.addEventListener('click', () => {
-            if (!this.isPointerLocked) {
-                document.body.requestPointerLock();
-            }
+        document.addEventListener('pointerlockerror', () => {
+            console.warn('Pointer lock failed');
         });
     }
     
-    handleKeyDown(event) {
-        switch (event.code) {
-            case 'KeyW':
-            case 'ArrowUp':
-                this.forward = true;
-                break;
-            case 'KeyS':
-            case 'ArrowDown':
-                this.backward = true;
-                break;
-            case 'KeyA':
-            case 'ArrowLeft':
-                this.left = true;
-                break;
-            case 'KeyD':
-            case 'ArrowRight':
-                this.right = true;
-                break;
-            case 'Space':
-                this.jump = true;
-                break;
-            case 'ShiftLeft':
-                this.run = true;
-                break;
-            case 'KeyE':
-                this.interact = true;
-                break;
-            case 'KeyQ':
-                this.drop = true;
-                break;
-            case 'KeyC':
-                this.craft = true;
-                break;
-            case 'KeyM':
-                this.map = true;
-                break;
-            case 'Escape':
-                this.toggleMenu();
-                break;
-        }
-    }
-    
-    handleKeyUp(event) {
-        switch (event.code) {
-            case 'KeyW':
-            case 'ArrowUp':
-                this.forward = false;
-                break;
-            case 'KeyS':
-            case 'ArrowDown':
-                this.backward = false;
-                break;
-            case 'KeyA':
-            case 'ArrowLeft':
-                this.left = false;
-                break;
-            case 'KeyD':
-            case 'ArrowRight':
-                this.right = false;
-                break;
-            case 'Space':
-                this.jump = false;
-                break;
-            case 'ShiftLeft':
-                this.run = false;
-                break;
-            case 'KeyE':
-                this.interact = false;
-                break;
-            case 'KeyQ':
-                this.drop = false;
-                break;
-            case 'KeyC':
-                this.craft = false;
-                break;
-            case 'KeyM':
-                this.map = false;
-                break;
-        }
-    }
-    
-    handleMouseMove(event) {
-        if (this.isPointerLocked) {
-            this.mouseDeltaX = event.movementX * this.mouseSensitivity * 0.002;
-            this.mouseDeltaY = event.movementY * this.mouseSensitivity * 0.002;
-        } else {
-            this.mouseX = event.clientX;
-            this.mouseY = event.clientY;
-        }
-    }
-    
-    handleMouseDown(event) {
-        if (event.button === 0) { // Left click
-            this.interact = true;
-        }
-    }
-    
-    handleMouseUp(event) {
-        if (event.button === 0) { // Left click
-            this.interact = false;
-        }
-    }
-    
-    handleTouchStart(event) {
-        event.preventDefault();
-        
-        if (event.touches.length === 1) {
-            const touch = event.touches[0];
-            this.touchStartX = touch.clientX;
-            this.touchStartY = touch.clientY;
-            this.isTouching = true;
-        }
-    }
-    
-    handleTouchMove(event) {
-        event.preventDefault();
-        
-        if (event.touches.length === 1 && this.isTouching) {
-            const touch = event.touches[0];
-            this.touchMoveX = touch.clientX - this.touchStartX;
-            this.touchMoveY = touch.clientY - this.touchStartY;
-            
-            // Convert touch movement to mouse movement
-            this.mouseDeltaX = this.touchMoveX * this.mouseSensitivity * 0.01;
-            this.mouseDeltaY = this.touchMoveY * this.mouseSensitivity * 0.01;
-        }
-    }
-    
-    handleTouchEnd(event) {
-        this.isTouching = false;
-        this.touchMoveX = 0;
-        this.touchMoveY = 0;
-    }
-    
-    update(deltaTime) {
-        // Reset mouse deltas
-        this.mouseDeltaX = 0;
-        this.mouseDeltaY = 0;
-    }
-    
-    // Getters for movement state
-    isMoving() {
-        return this.forward || this.backward || this.left || this.right;
-    }
-    
-    getMovementVector() {
-        let x = 0;
-        let z = 0;
-        
-        if (this.forward) z -= 1;
-        if (this.backward) z += 1;
-        if (this.left) x -= 1;
-        if (this.right) x += 1;
-        
-        // Normalize
-        if (x !== 0 || z !== 0) {
-            const length = Math.sqrt(x * x + z * z);
-            x /= length;
-            z /= length;
-        }
-        
-        return { x, z };
-    }
-    
-    getMouseDelta() {
-        return {
-            x: this.mouseDeltaX,
-            y: this.mouseDeltaY
-        };
-    }
-    
-    // Setters for external control
-    setForward(value) {
-        this.forward = value;
-    }
-    
-    setBackward(value) {
-        this.backward = value;
-    }
-    
-    setLeft(value) {
-        this.left = value;
-    }
-    
-    setRight(value) {
-        this.right = value;
-    }
-    
-    setJump(value) {
-        this.jump = value;
-    }
-    
-    setRun(value) {
-        this.run = value;
-    }
-    
-    setInteract(value) {
-        this.interact = value;
-    }
-    
-    setDrop(value) {
-        this.drop = value;
-    }
-    
-    // Mouse sensitivity
-    setMouseSensitivity(sensitivity) {
-        this.mouseSensitivity = MathUtils.clamp(sensitivity, 0.1, 3.0);
-    }
-    
-    getMouseSensitivity() {
-        return this.mouseSensitivity;
-    }
-    
-    // Pointer lock management
     requestPointerLock() {
-        if (!this.isPointerLocked) {
+        if (document.body.requestPointerLock) {
             document.body.requestPointerLock();
         }
     }
     
     exitPointerLock() {
-        if (this.isPointerLocked) {
+        if (document.exitPointerLock) {
             document.exitPointerLock();
         }
     }
     
-    // Mobile-specific methods
     isMobile() {
         return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+    
+    update(deltaTime) {
+        // Reset mouse delta
+        this.mouseDeltaX = 0;
+        this.mouseDeltaY = 0;
+        
+        // Update camera rotation based on mouse movement
+        if (window.game && window.game.camera) {
+            const sensitivity = 0.002;
+            window.game.camera.rotate(this.mouseDeltaX * sensitivity, this.mouseDeltaY * sensitivity);
+        }
+        
+        // Handle ability usage
+        if (this.telepathy && window.game && window.game.player) {
+            window.game.player.useAbility('telepathy');
+            this.telepathy = false;
+        }
+        
+        if (this.timePerception && window.game && window.game.player) {
+            window.game.player.useAbility('timePerception');
+            this.timePerception = false;
+        }
+    }
+    
+    // Getter methods for current state
+    getMovementVector() {
+        return {
+            x: (this.right ? 1 : 0) - (this.left ? 1 : 0),
+            z: (this.backward ? 1 : 0) - (this.forward ? 1 : 0)
+        };
+    }
+    
+    isMoving() {
+        return this.forward || this.backward || this.left || this.right;
+    }
+    
+    isRunning() {
+        return this.run || this.sprint;
     }
     
     // Reset all controls
@@ -330,38 +389,20 @@ class Controls {
         this.right = false;
         this.jump = false;
         this.run = false;
+        this.sprint = false;
+        this.crouch = false;
+        this.fly = false;
         this.interact = false;
-        this.drop = false;
         this.craft = false;
         this.map = false;
-        this.mouseDeltaX = 0;
-        this.mouseDeltaY = 0;
+        this.inventory = false;
+        this.telepathy = false;
+        this.timePerception = false;
+        this.enhancedVision = false;
     }
-    
-    // Get control state for debugging
-    getState() {
-        return {
-            movement: {
-                forward: this.forward,
-                backward: this.backward,
-                left: this.left,
-                right: this.right
-            },
-            actions: {
-                jump: this.jump,
-                run: this.run,
-                interact: this.interact,
-                drop: this.drop,
-                craft: this.craft,
-                map: this.map
-            },
-            mouse: {
-                deltaX: this.mouseDeltaX,
-                deltaY: this.mouseDeltaY,
-                sensitivity: this.mouseSensitivity
-            },
-            pointerLock: this.isPointerLocked,
-            mobile: this.isMobile()
-        };
-    }
+}
+
+// Export for use in other modules
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = Controls;
 }

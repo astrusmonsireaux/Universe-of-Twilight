@@ -16,11 +16,31 @@ class Player {
             this.species.appearance.height.max
         );
         
-        // Movement state
+        // Enhanced movement state
         this.isMoving = false;
         this.isRunning = false;
         this.isJumping = false;
         this.isFlying = false;
+        this.isCrouching = false;
+        this.isSprinting = false;
+        
+        // Homo Kaylex abilities
+        this.abilities = {
+            photosynthesis: true,
+            enhancedVision: true,
+            telepathy: false, // Unlockable ability
+            timePerception: false // Unlockable ability
+        };
+        
+        // Energy and health management
+        this.energy = GAME_CONSTANTS.MAX_ENERGY;
+        this.health = GAME_CONSTANTS.MAX_HEALTH;
+        this.energyRegenRate = GAME_CONSTANTS.ENERGY_REGEN_RATE;
+        this.healthRegenRate = GAME_CONSTANTS.HEALTH_REGEN_RATE;
+        
+        // Photosynthesis tracking
+        this.lastSunlight = 0;
+        this.sunlightBonus = 0;
         
         // Physics
         this.gravity = GAME_CONSTANTS.GRAVITY;
@@ -40,8 +60,8 @@ class Player {
     }
     
     createMesh() {
-        // Create simple player mesh (placeholder)
-        const geometry = new THREE.CapsuleGeometry(0.3, this.height - 0.6, 4, 8);
+        // Create enhanced player mesh with Homo Kaylex features
+        const geometry = new THREE.CapsuleGeometry(0.3, this.height - 0.6, 8, 16);
         const material = new THREE.MeshLambertMaterial({ 
             color: this.getSkinColorHex(),
             transparent: true,
@@ -52,14 +72,19 @@ class Player {
         this.mesh.castShadow = true;
         this.mesh.receiveShadow = true;
         
-        // Add eyes
+        // Add eyes with enhanced detail
         this.addEyes();
+        
+        // Add photosynthetic skin effect
+        this.addPhotosyntheticEffect();
     }
     
     addEyes() {
-        const eyeGeometry = new THREE.SphereGeometry(0.05, 8, 8);
+        const eyeGeometry = new THREE.SphereGeometry(0.05, 12, 12);
         const eyeMaterial = new THREE.MeshBasicMaterial({ 
-            color: this.getEyeColorHex() 
+            color: this.getEyeColorHex(),
+            emissive: this.getEyeColorHex(),
+            emissiveIntensity: 0.2
         });
         
         const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
@@ -70,6 +95,20 @@ class Player {
         
         this.mesh.add(leftEye);
         this.mesh.add(rightEye);
+    }
+    
+    addPhotosyntheticEffect() {
+        // Add a subtle glow effect around the player
+        const glowGeometry = new THREE.SphereGeometry(0.4, 16, 16);
+        const glowMaterial = new THREE.MeshBasicMaterial({
+            color: 0x00ff00,
+            transparent: true,
+            opacity: 0.1,
+            side: THREE.BackSide
+        });
+        
+        this.glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
+        this.mesh.add(this.glowMesh);
     }
     
     getSkinColorHex() {
@@ -114,8 +153,66 @@ class Player {
             this.mesh.rotation.set(this.rotation.x, this.rotation.y, this.rotation.z);
         }
         
-        // Photosynthesis effect (subtle glow)
+        // Update Homo Kaylex abilities
         this.updatePhotosynthesis(deltaTime);
+        this.updateEnergyRegeneration(deltaTime);
+        this.updateHealthRegeneration(deltaTime);
+        
+        // Update movement state
+        this.updateMovementState();
+    }
+    
+    updatePhotosynthesis(deltaTime) {
+        if (this.mesh && this.mesh.material) {
+            // Calculate sunlight exposure
+            const time = Date.now() * 0.001;
+            const dayTime = (time % 2400) / 2400; // 24-hour cycle
+            
+            // Sunlight intensity based on time of day
+            let sunlightIntensity = 0;
+            if (dayTime > 0.25 && dayTime < 0.75) {
+                sunlightIntensity = Math.sin((dayTime - 0.25) * Math.PI * 2) * 0.5 + 0.5;
+            }
+            
+            // Update glow effect based on sunlight
+            const glow = 0.1 + sunlightIntensity * 0.3;
+            this.mesh.material.emissive = new THREE.Color(0x00ff00).multiplyScalar(glow);
+            
+            // Energy bonus from photosynthesis
+            if (sunlightIntensity > 0.3) {
+                this.sunlightBonus = sunlightIntensity * 0.5;
+            } else {
+                this.sunlightBonus = 0;
+            }
+            
+            this.lastSunlight = sunlightIntensity;
+        }
+    }
+    
+    updateEnergyRegeneration(deltaTime) {
+        const baseRegen = this.energyRegenRate * deltaTime;
+        const photosynthesisBonus = this.sunlightBonus * deltaTime;
+        const totalRegen = baseRegen + photosynthesisBonus;
+        
+        this.energy = Math.min(GAME_CONSTANTS.MAX_ENERGY, this.energy + totalRegen);
+    }
+    
+    updateHealthRegeneration(deltaTime) {
+        if (this.energy > 50) { // Only regenerate health when energy is sufficient
+            const regen = this.healthRegenRate * deltaTime;
+            this.health = Math.min(GAME_CONSTANTS.MAX_HEALTH, this.health + regen);
+        }
+    }
+    
+    updateMovementState() {
+        // Update movement flags
+        this.isMoving = Math.abs(this.velocity.x) > 0.1 || Math.abs(this.velocity.z) > 0.1;
+        
+        // Update energy consumption
+        if (this.isMoving) {
+            const energyCost = this.isRunning ? 2 : 1;
+            this.energy = Math.max(0, this.energy - energyCost * 0.01);
+        }
     }
     
     checkTerrainCollision() {
@@ -136,18 +233,19 @@ class Player {
         }
     }
     
-    updatePhotosynthesis(deltaTime) {
-        if (this.mesh && this.mesh.material) {
-            // Add subtle glow effect to represent photosynthesis
-            const time = Date.now() * 0.001;
-            const glow = 0.1 + Math.sin(time * 2) * 0.05;
-            this.mesh.material.emissive = new THREE.Color(0x00ff00).multiplyScalar(glow);
-        }
-    }
-    
     move(controls, deltaTime) {
-        const speed = this.isRunning ? this.runSpeed : this.walkSpeed;
-        if (this.isFlying) speed = this.flySpeed;
+        let speed = this.walkSpeed;
+        
+        // Determine movement speed based on state
+        if (this.isRunning && this.energy > 20) {
+            speed = this.runSpeed;
+        } else if (this.isSprinting && this.energy > 40) {
+            speed = this.runSpeed * 1.5;
+        } else if (this.isFlying) {
+            speed = this.flySpeed;
+        } else if (this.isCrouching) {
+            speed = this.walkSpeed * 0.5;
+        }
         
         // Calculate movement direction
         let moveX = 0;
@@ -178,11 +276,71 @@ class Player {
     }
     
     jump() {
-        if (this.onGround && !this.isJumping) {
+        if (this.onGround && !this.isJumping && this.energy > 10) {
             this.velocity.y = this.jumpForce;
             this.onGround = false;
             this.isJumping = true;
+            this.energy -= 10; // Energy cost for jumping
         }
+    }
+    
+    toggleRun() {
+        if (this.energy > 20) {
+            this.isRunning = !this.isRunning;
+            this.isSprinting = false;
+        }
+    }
+    
+    toggleSprint() {
+        if (this.energy > 40) {
+            this.isSprinting = !this.isSprinting;
+            this.isRunning = false;
+        }
+    }
+    
+    toggleCrouch() {
+        this.isCrouching = !this.isCrouching;
+        if (this.isCrouching) {
+            this.height = 0.9; // Half height when crouching
+        } else {
+            this.height = 1.8; // Normal height
+        }
+    }
+    
+    toggleFly() {
+        this.isFlying = !this.isFlying;
+        if (this.isFlying) {
+            this.velocity.y = 0;
+        }
+    }
+    
+    useAbility(abilityName) {
+        if (!this.abilities[abilityName]) {
+            console.log(`Ability ${abilityName} not unlocked`);
+            return false;
+        }
+        
+        switch (abilityName) {
+            case 'telepathy':
+                if (this.energy > 30) {
+                    this.energy -= 30;
+                    // Telepathy effect would go here
+                    console.log('Using telepathy...');
+                    return true;
+                }
+                break;
+                
+            case 'timePerception':
+                if (this.energy > 50) {
+                    this.energy -= 50;
+                    // Time perception effect would go here
+                    console.log('Using time perception...');
+                    return true;
+                }
+                break;
+        }
+        
+        return false;
     }
     
     setPosition(x, y, z) {
@@ -199,86 +357,42 @@ class Player {
         return { ...this.position };
     }
     
-    setRotation(x, y, z) {
-        this.rotation.x = x;
-        this.rotation.y = y;
-        this.rotation.z = z;
-        
-        if (this.mesh) {
-            this.mesh.rotation.set(x, y, z);
-        }
+    getHealth() {
+        return this.health;
     }
     
-    getRotation() {
-        return { ...this.rotation };
-    }
-    
-    setSelectedSlot(slot) {
-        this.selectedSlot = Math.max(0, Math.min(GAME_CONSTANTS.INVENTORY_SLOTS - 1, slot));
-    }
-    
-    getSelectedSlot() {
-        return this.selectedSlot;
-    }
-    
-    render(scene) {
-        if (this.mesh) {
-            scene.addObject('player', this.mesh);
-        }
-    }
-    
-    // Interaction methods
-    interact() {
-        // Player interaction logic
-        console.log('Player interaction');
+    getEnergy() {
+        return this.energy;
     }
     
     takeDamage(amount) {
-        // Damage effect
-        if (this.mesh && this.mesh.material) {
-            this.mesh.material.color.setHex(0xff0000);
-            setTimeout(() => {
-                this.mesh.material.color.setHex(this.getSkinColorHex());
-            }, 200);
-        }
+        this.health = Math.max(0, this.health - amount);
+        return this.health <= 0;
     }
     
     heal(amount) {
-        // Healing effect
-        if (this.mesh && this.mesh.material) {
-            this.mesh.material.color.setHex(0x00ff00);
-            setTimeout(() => {
-                this.mesh.material.color.setHex(this.getSkinColorHex());
-            }, 200);
+        this.health = Math.min(GAME_CONSTANTS.MAX_HEALTH, this.health + amount);
+    }
+    
+    consumeEnergy(amount) {
+        this.energy = Math.max(0, this.energy - amount);
+    }
+    
+    restoreEnergy(amount) {
+        this.energy = Math.min(GAME_CONSTANTS.MAX_ENERGY, this.energy + amount);
+    }
+    
+    unlockAbility(abilityName) {
+        if (this.abilities.hasOwnProperty(abilityName)) {
+            this.abilities[abilityName] = true;
+            console.log(`Ability ${abilityName} unlocked!`);
+            return true;
         }
+        return false;
     }
-    
-    // Special Homo Kaylex abilities
-    photosynthesis() {
-        // Regenerate energy through photosynthesis
-        return GAME_CONSTANTS.ENERGY_REGEN_RATE * 2; // Enhanced regeneration
-    }
-    
-    // Truth-telling trait (cannot lie)
-    speak(message) {
-        // Homo Kaylex cannot lie - this is enforced at the species level
-        return message; // Always returns the truth
-    }
-    
-    // Hermaphroditic reproduction (simplified)
-    canReproduce() {
-        return true; // All Homo Kaylex can reproduce
-    }
-    
-    // Dispose
-    dispose() {
-        if (this.mesh) {
-            if (this.mesh.geometry) {
-                this.mesh.geometry.dispose();
-            }
-            if (this.mesh.material) {
-                this.mesh.material.dispose();
-            }
-        }
-    }
+}
+
+// Export for use in other modules
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = Player;
 }
