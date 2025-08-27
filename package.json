@@ -1,0 +1,46 @@
+{
+  "name": "veauxalia-universe-of-twilight",
+  "version": "1.0.0",
+  "description": "A 3D survival, adventure, sci-fi, and fantasy game set in the Veauxalia solar system",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "dev": "python -m http.server 8000",
+    "build": "echo 'No build process needed for web-based game'",
+    "test": "echo 'No tests specified'"
+  },
+  "keywords": [
+    "game",
+    "3d",
+    "survival",
+    "adventure",
+    "sci-fi",
+    "fantasy",
+    "space",
+    "exploration",
+    "threejs",
+    "webgl"
+  ],
+  "author": "Veauxalia Development Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/veauxalia-universe-of-twilight.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/veauxalia-universe-of-twilight/issues"
+  },
+  "homepage": "https://yourusername.github.io/veauxalia-universe-of-twilight",
+  "dependencies": {
+    "three": "^0.128.0"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}
