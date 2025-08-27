@@ -64,21 +64,29 @@ Veauxalia is an immersive 3D game that combines elements of Universe Sandbox, Wo
    - Regenerate energy from sunlight
    - Visual glow effect based on light exposure
    - Energy bonus during daylight hours
+   - Enhanced by special items
 
 2. **Enhanced Vision** (Always Active)
    - Improved visibility in various conditions
    - Better color perception
    - Night vision capabilities
+   - Visual feedback for ability states
 
-3. **Telepathy** (Unlockable)
+3. **Telepathy** (Unlockable via Telepathy Crystal)
    - Communicate with other entities
    - Sense nearby life forms
    - Energy cost: 30 units
+   - Duration: 10 seconds
+   - Cooldown: 30 seconds
+   - Visual effect: Blue glow
 
-4. **Time Perception** (Unlockable)
-   - Slow down perceived time
+4. **Time Perception** (Unlockable via Time Crystal)
+   - Slow down perceived time by 50%
    - Enhanced reaction speed
    - Energy cost: 50 units
+   - Duration: 15 seconds
+   - Cooldown: 60 seconds
+   - Visual effect: Orange glow
 
 ### Energy System
 - **Base Regeneration** - Natural energy recovery
@@ -114,10 +122,12 @@ Veauxalia is an immersive 3D game that combines elements of Universe Sandbox, Wo
 
 ### User Interface
 - **Enhanced HUD** - Real-time player status and abilities
-- **Ability Indicators** - Visual representation of available powers
+- **Ability Indicators** - Visual representation of available powers with cooldown timers
 - **Photosynthesis Monitor** - Sunlight exposure and energy bonus
 - **Interactive Inventory** - Drag-and-drop item management
 - **System Map** - Interactive solar system navigation
+- **Categorized Crafting** - Organized recipes by type with descriptions
+- **Visual Feedback** - Glow effects and animations for active abilities
 
 ## 🚀 Quick Start
 
@@ -234,13 +244,17 @@ veauxalia/
 
 ### Planned Features
 - **Multiplayer Support** - Cooperative and competitive gameplay
-- **Advanced Crafting** - Complex item creation system
+- **Advanced Crafting** - Complex item creation system (Enhanced)
 - **Quest System** - Story-driven objectives
 - **NPCs** - Non-player characters with AI
 - **Space Travel** - Interplanetary exploration
 - **Base Building** - Construct and customize bases
 - **Advanced Combat** - Weapon and armor systems
 - **Weather Events** - Dynamic atmospheric phenomena
+- **Ability Progression** - Skill trees and ability upgrades
+- **Advanced Item Effects** - More special items and effects
+- **Biome-Specific Resources** - Unique materials per planet
+- **Crafting Automation** - Automated crafting systems
 
 ### Technical Improvements
 - **WebAssembly** - Performance optimization

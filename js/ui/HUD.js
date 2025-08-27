@@ -286,22 +286,100 @@ class HUD {
         // Update telepathy indicator
         const telepathyIndicator = document.getElementById('telepathy-indicator');
         if (telepathyIndicator) {
+            const cooldownElement = telepathyIndicator.querySelector('.ability-cooldown');
+            
             if (player.abilities.telepathy) {
                 telepathyIndicator.classList.remove('locked');
-                telepathyIndicator.classList.toggle('active', player.energy > 30);
+                
+                // Check if ability is active
+                if (player.isAbilityActive('telepathy')) {
+                    telepathyIndicator.classList.add('active');
+                    const timer = player.getAbilityTimer('telepathy');
+                    const duration = player.abilityDurations.telepathy;
+                    const remaining = Math.max(0, timer / duration);
+                    
+                    if (cooldownElement) {
+                        cooldownElement.style.height = `${remaining * 100}%`;
+                        cooldownElement.style.backgroundColor = '#4444ff';
+                    }
+                } else {
+                    telepathyIndicator.classList.remove('active');
+                    
+                    // Check cooldown
+                    const cooldown = player.getAbilityCooldown('telepathy');
+                    if (cooldown > 0) {
+                        if (cooldownElement) {
+                            cooldownElement.style.height = `${(cooldown / 30) * 100}%`;
+                            cooldownElement.style.backgroundColor = '#666666';
+                        }
+                    } else {
+                        // Check if enough energy
+                        if (player.energy >= player.abilityCosts.telepathy) {
+                            telepathyIndicator.classList.add('available');
+                        } else {
+                            telepathyIndicator.classList.remove('available');
+                        }
+                        
+                        if (cooldownElement) {
+                            cooldownElement.style.height = '0%';
+                        }
+                    }
+                }
             } else {
                 telepathyIndicator.classList.add('locked');
+                if (cooldownElement) {
+                    cooldownElement.style.height = '0%';
+                }
             }
         }
         
         // Update time perception indicator
         const timePerceptionIndicator = document.getElementById('time-perception-indicator');
         if (timePerceptionIndicator) {
+            const cooldownElement = timePerceptionIndicator.querySelector('.ability-cooldown');
+            
             if (player.abilities.timePerception) {
                 timePerceptionIndicator.classList.remove('locked');
-                timePerceptionIndicator.classList.toggle('active', player.energy > 50);
+                
+                // Check if ability is active
+                if (player.isAbilityActive('timePerception')) {
+                    timePerceptionIndicator.classList.add('active');
+                    const timer = player.getAbilityTimer('timePerception');
+                    const duration = player.abilityDurations.timePerception;
+                    const remaining = Math.max(0, timer / duration);
+                    
+                    if (cooldownElement) {
+                        cooldownElement.style.height = `${remaining * 100}%`;
+                        cooldownElement.style.backgroundColor = '#ffaa00';
+                    }
+                } else {
+                    timePerceptionIndicator.classList.remove('active');
+                    
+                    // Check cooldown
+                    const cooldown = player.getAbilityCooldown('timePerception');
+                    if (cooldown > 0) {
+                        if (cooldownElement) {
+                            cooldownElement.style.height = `${(cooldown / 60) * 100}%`;
+                            cooldownElement.style.backgroundColor = '#666666';
+                        }
+                    } else {
+                        // Check if enough energy
+                        if (player.energy >= player.abilityCosts.timePerception) {
+                            timePerceptionIndicator.classList.add('available');
+                        } else {
+                            timePerceptionIndicator.classList.remove('available');
+                        }
+                        
+                        if (cooldownElement) {
+                            cooldownElement.style.height = '0%';
+                        }
+                    }
+                }
             } else {
                 timePerceptionIndicator.classList.add('locked');
+                if (cooldownElement) {
+                    cooldownElement.style.height = '0%';
+                }
             }
         }
         
@@ -311,6 +389,16 @@ class HUD {
             if (player.abilities.enhancedVision) {
                 enhancedVisionIndicator.classList.remove('locked');
                 enhancedVisionIndicator.classList.add('active');
+                
+                // Show photosynthesis bonus if active
+                const photosynthesisIndicator = document.getElementById('photosynthesis-indicator');
+                if (photosynthesisIndicator && player.sunlightBonus > 0) {
+                    photosynthesisIndicator.classList.add('active');
+                    const bonusText = photosynthesisIndicator.querySelector('.bonus-text');
+                    if (bonusText) {
+                        bonusText.textContent = `+${Math.round(player.sunlightBonus * 100)}%`;
+                    }
+                }
             } else {
                 enhancedVisionIndicator.classList.add('locked');
             }

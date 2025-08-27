@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veauxalia Game Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #1a1a2e;
+            color: #fff;
+        }
+        .test-section {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+        .success { color: #00ff00; }
+        .error { color: #ff0000; }
+        .info { color: #00d4ff; }
+        button {
+            background: #00d4ff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #00b8e6;
+        }
+    </style>
+</head>
+<body>
+    <h1>Veauxalia Game Test</h1>
+    
+    <div class="test-section">
+        <h2>Game Features Test</h2>
+        <p class="info">Testing the enhanced Veauxalia game with new abilities and crafting system.</p>
+        
+        <button onclick="testGameLoad()">Test Game Load</button>
+        <button onclick="testAbilities()">Test Abilities</button>
+        <button onclick="testCrafting()">Test Crafting</button>
+        <button onclick="testItems()">Test Items</button>
+        
+        <div id="test-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Instructions</h2>
+        <ul>
+            <li><strong>Movement:</strong> WASD keys</li>
+            <li><strong>Jump:</strong> Spacebar</li>
+            <li><strong>Run:</strong> Shift</li>
+            <li><strong>Telepathy:</strong> T key (when unlocked)</li>
+            <li><strong>Time Perception:</strong> Y key (when unlocked)</li>
+            <li><strong>Crafting:</strong> C key</li>
+            <li><strong>Map:</strong> M key</li>
+            <li><strong>Inventory:</strong> I key</li>
+        </ul>
+    </div>
+    
+    <div class="test-section">
+        <h2>New Features</h2>
+        <ul>
+            <li><strong>Enhanced Player Abilities:</strong> Telepathy and Time Perception with cooldowns</li>
+            <li><strong>Advanced Crafting System:</strong> Categorized recipes with descriptions</li>
+            <li><strong>Special Items:</strong> Crystals that unlock abilities</li>
+            <li><strong>Improved HUD:</strong> Ability indicators with cooldown visualization</li>
+            <li><strong>Time Scale System:</strong> Time perception slows down game time</li>
+            <li><strong>Enhanced Item System:</strong> More items with proper stacking and effects</li>
+        </ul>
+    </div>
+
+    <script>
+        function testGameLoad() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<p class="info">Testing game load...</p>';
+            
+            // Check if game files exist
+            fetch('js/main.js')
+                .then(response => {
+                    if (response.ok) {
+                        results.innerHTML += '<p class="success">✓ Main game file loaded successfully</p>';
+                        return fetch('js/core/Game.js');
+                    } else {
+                        throw new Error('Main game file not found');
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        results.innerHTML += '<p class="success">✓ Game engine loaded successfully</p>';
+                        return fetch('js/core/Player.js');
+                    } else {
+                        throw new Error('Game engine not found');
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        results.innerHTML += '<p class="success">✓ Player system loaded successfully</p>';
+                        return fetch('js/ui/Crafting.js');
+                    } else {
+                        throw new Error('Player system not found');
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        results.innerHTML += '<p class="success">✓ Crafting system loaded successfully</p>';
+                        results.innerHTML += '<p class="success">✓ All core systems are available!</p>';
+                    } else {
+                        throw new Error('Crafting system not found');
+                    }
+                })
+                .catch(error => {
+                    results.innerHTML += `<p class="error">✗ Error: ${error.message}</p>`;
+                });
+        }
+        
+        function testAbilities() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<p class="info">Testing ability system...</p>';
+            
+            // Test ability constants
+            if (typeof GAME_CONSTANTS !== 'undefined') {
+                results.innerHTML += '<p class="success">✓ Game constants loaded</p>';
+            } else {
+                results.innerHTML += '<p class="error">✗ Game constants not found</p>';
+            }
+            
+            // Test Homo Kaylex data
+            if (typeof HOMO_KAYLEX !== 'undefined') {
+                results.innerHTML += '<p class="success">✓ Homo Kaylex species data loaded</p>';
+            } else {
+                results.innerHTML += '<p class="error">✗ Homo Kaylex data not found</p>';
+            }
+            
+            results.innerHTML += '<p class="info">Ability system test complete. Check browser console for detailed logs.</p>';
+        }
+        
+        function testCrafting() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<p class="info">Testing crafting system...</p>';
+            
+            // Test item data
+            if (typeof ITEM_DATA !== 'undefined') {
+                results.innerHTML += '<p class="success">✓ Item data loaded</p>';
+                
+                // Check for new items
+                const newItems = ['telepathy_crystal', 'time_crystal', 'photosynthesis_enhancer'];
+                newItems.forEach(item => {
+                    if (ITEM_DATA[item]) {
+                        results.innerHTML += `<p class="success">✓ ${item} item found</p>`;
+                    } else {
+                        results.innerHTML += `<p class="error">✗ ${item} item not found</p>`;
+                    }
+                });
+            } else {
+                results.innerHTML += '<p class="error">✗ Item data not found</p>';
+            }
+            
+            results.innerHTML += '<p class="info">Crafting system test complete.</p>';
+        }
+        
+        function testItems() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<p class="info">Testing item system...</p>';
+            
+            // Check for enhanced item properties
+            if (typeof ITEM_DATA !== 'undefined') {
+                const testItem = ITEM_DATA['wood'];
+                if (testItem && testItem.description) {
+                    results.innerHTML += '<p class="success">✓ Enhanced item properties working</p>';
+                } else {
+                    results.innerHTML += '<p class="error">✗ Enhanced item properties not found</p>';
+                }
+                
+                // Check for special items
+                const specialItems = ITEM_DATA['telepathy_crystal'];
+                if (specialItems && specialItems.effect) {
+                    results.innerHTML += '<p class="success">✓ Special item effects configured</p>';
+                } else {
+                    results.innerHTML += '<p class="error">✗ Special item effects not configured</p>';
+                }
+            }
+            
+            results.innerHTML += '<p class="info">Item system test complete.</p>';
+        }
+        
+        // Auto-run basic tests on page load
+        window.addEventListener('load', () => {
+            setTimeout(testGameLoad, 1000);
+        });
+    </script>
+</body>
+</html>

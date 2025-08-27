@@ -24,13 +24,41 @@ class Player {
         this.isCrouching = false;
         this.isSprinting = false;
         
-        // Homo Kaylex abilities
-        this.abilities = {
-            photosynthesis: true,
-            enhancedVision: true,
-            telepathy: false, // Unlockable ability
-            timePerception: false // Unlockable ability
-        };
+            // Homo Kaylex abilities
+    this.abilities = {
+        photosynthesis: true,
+        enhancedVision: true,
+        telepathy: false, // Unlockable ability
+        timePerception: false // Unlockable ability
+    };
+    
+    // Ability cooldowns and costs
+    this.abilityCooldowns = {
+        telepathy: 0,
+        timePerception: 0
+    };
+    
+    this.abilityCosts = {
+        telepathy: 30,
+        timePerception: 50
+    };
+    
+    this.abilityDurations = {
+        telepathy: 10, // seconds
+        timePerception: 15 // seconds
+    };
+    
+    // Active ability states
+    this.activeAbilities = {
+        telepathy: false,
+        timePerception: false
+    };
+    
+    // Ability timers
+    this.abilityTimers = {
+        telepathy: 0,
+        timePerception: 0
+    };
         
         // Energy and health management
         this.energy = GAME_CONSTANTS.MAX_ENERGY;
@@ -160,6 +188,9 @@ class Player {
         
         // Update movement state
         this.updateMovementState();
+        
+        // Update abilities
+        this.updateAbilities(deltaTime);
     }
     
     updatePhotosynthesis(deltaTime) {
@@ -314,33 +345,159 @@ class Player {
         }
     }
     
+    updateAbilities(deltaTime) {
+        // Update cooldowns
+        Object.keys(this.abilityCooldowns).forEach(ability => {
+            if (this.abilityCooldowns[ability] > 0) {
+                this.abilityCooldowns[ability] -= deltaTime;
+            }
+        });
+        
+        // Update active ability timers
+        Object.keys(this.abilityTimers).forEach(ability => {
+            if (this.abilityTimers[ability] > 0) {
+                this.abilityTimers[ability] -= deltaTime;
+                
+                // Deactivate ability when timer expires
+                if (this.abilityTimers[ability] <= 0) {
+                    this.deactivateAbility(ability);
+                }
+            }
+        });
+    }
+    
     useAbility(abilityName) {
         if (!this.abilities[abilityName]) {
             console.log(`Ability ${abilityName} not unlocked`);
             return false;
         }
         
-        switch (abilityName) {
-            case 'telepathy':
-                if (this.energy > 30) {
-                    this.energy -= 30;
-                    // Telepathy effect would go here
-                    console.log('Using telepathy...');
-                    return true;
-                }
-                break;
-                
-            case 'timePerception':
-                if (this.energy > 50) {
-                    this.energy -= 50;
-                    // Time perception effect would go here
-                    console.log('Using time perception...');
-                    return true;
-                }
-                break;
+        // Check cooldown
+        if (this.abilityCooldowns[abilityName] > 0) {
+            console.log(`${abilityName} is on cooldown`);
+            return false;
         }
         
-        return false;
+        // Check energy cost
+        if (this.energy < this.abilityCosts[abilityName]) {
+            console.log(`Not enough energy for ${abilityName}`);
+            return false;
+        }
+        
+        switch (abilityName) {
+            case 'telepathy':
+                return this.activateTelepathy();
+                
+            case 'timePerception':
+                return this.activateTimePerception();
+                
+            default:
+                console.log(`Unknown ability: ${abilityName}`);
+                return false;
+        }
+    }
+    
+    activateTelepathy() {
+        if (this.activeAbilities.telepathy) {
+            this.deactivateAbility('telepathy');
+            return true;
+        }
+        
+        // Consume energy
+        this.energy -= this.abilityCosts.telepathy;
+        
+        // Activate ability
+        this.activeAbilities.telepathy = true;
+        this.abilityTimers.telepathy = this.abilityDurations.telepathy;
+        
+        // Set cooldown
+        this.abilityCooldowns.telepathy = 30; // 30 second cooldown
+        
+        console.log('Telepathy activated! Sensing nearby life forms...');
+        
+        // Visual effect - enhance player glow
+        if (this.mesh && this.mesh.material) {
+            this.mesh.material.emissive = new THREE.Color(0x4444ff).multiplyScalar(0.3);
+        }
+        
+        // Trigger telepathy scan
+        this.scanForLifeForms();
+        
+        return true;
+    }
+    
+    activateTimePerception() {
+        if (this.activeAbilities.timePerception) {
+            this.deactivateAbility('timePerception');
+            return true;
+        }
+        
+        // Consume energy
+        this.energy -= this.abilityCosts.timePerception;
+        
+        // Activate ability
+        this.activeAbilities.timePerception = true;
+        this.abilityTimers.timePerception = this.abilityDurations.timePerception;
+        
+        // Set cooldown
+        this.abilityCooldowns.timePerception = 60; // 60 second cooldown
+        
+        console.log('Time perception activated! Time appears to slow down...');
+        
+        // Visual effect - time distortion
+        if (this.mesh && this.mesh.material) {
+            this.mesh.material.emissive = new THREE.Color(0xffaa00).multiplyScalar(0.4);
+        }
+        
+        // Slow down time for the player
+        if (window.game) {
+            window.game.setTimeScale(0.5); // Slow down time by 50%
+        }
+        
+        return true;
+    }
+    
+    deactivateAbility(abilityName) {
+        if (this.activeAbilities[abilityName]) {
+            this.activeAbilities[abilityName] = false;
+            this.abilityTimers[abilityName] = 0;
+            
+            console.log(`${abilityName} deactivated`);
+            
+            // Reset visual effects
+            if (this.mesh && this.mesh.material) {
+                this.mesh.material.emissive = new THREE.Color(0x000000);
+            }
+            
+            // Reset time scale if time perception was deactivated
+            if (abilityName === 'timePerception' && window.game) {
+                window.game.setTimeScale(1.0);
+            }
+        }
+    }
+    
+    scanForLifeForms() {
+        // Scan for nearby entities (placeholder for future NPC system)
+        const scanRadius = 50;
+        const playerPos = this.getPosition();
+        
+        console.log(`Scanning for life forms within ${scanRadius} units...`);
+        
+        // This would integrate with a future entity system
+        // For now, just log the scan
+        console.log('No life forms detected in range');
+    }
+    
+    isAbilityActive(abilityName) {
+        return this.activeAbilities[abilityName] || false;
+    }
+    
+    getAbilityCooldown(abilityName) {
+        return this.abilityCooldowns[abilityName] || 0;
+    }
+    
+    getAbilityTimer(abilityName) {
+        return this.abilityTimers[abilityName] || 0;
     }
     
     setPosition(x, y, z) {

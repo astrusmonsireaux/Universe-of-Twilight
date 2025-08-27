@@ -6,6 +6,7 @@ class Game {
         this.gameTime = 0;
         this.deltaTime = 0;
         this.lastFrameTime = 0;
+        this.timeScale = 1.0;
         
         // Core systems
         this.scene = null;
@@ -171,10 +172,13 @@ class Game {
     }
     
     update(deltaTime) {
-        this.gameTime += deltaTime;
+        // Apply time scale
+        const scaledDeltaTime = deltaTime * this.timeScale;
+        
+        this.gameTime += scaledDeltaTime;
         
         // Update player movement based on controls
-        this.player.move(this.controls, deltaTime);
+        this.player.move(this.controls, scaledDeltaTime);
         
         // Handle jumping
         if (this.controls.jump) {
@@ -182,28 +186,28 @@ class Game {
         }
         
         // Update core systems
-        this.player.update(deltaTime);
-        this.camera.update(deltaTime);
-        this.controls.update(deltaTime);
+        this.player.update(scaledDeltaTime);
+        this.camera.update(scaledDeltaTime);
+        this.controls.update(scaledDeltaTime);
         
         // Update world systems
         if (this.currentPlanet) {
-            this.currentPlanet.update(deltaTime);
+            this.currentPlanet.update(scaledDeltaTime);
         }
         
         // Update enhanced systems
-        this.physics.update(deltaTime);
-        this.weather.update(deltaTime);
-        this.solarSystem.update(deltaTime);
+        this.physics.update(scaledDeltaTime);
+        this.weather.update(scaledDeltaTime);
+        this.solarSystem.update(scaledDeltaTime);
         
         // Update orbital mechanics
-        this.orbitalMechanics.update(deltaTime);
+        this.orbitalMechanics.update(scaledDeltaTime);
         
         // Update UI
-        this.hud.update(deltaTime);
+        this.hud.update(deltaTime); // UI updates at normal speed
         
         // Update player stats
-        this.updatePlayerStats(deltaTime);
+        this.updatePlayerStats(scaledDeltaTime);
         
         // Update HUD with player position
         const playerPos = this.player.getPosition();
@@ -504,6 +508,25 @@ class Game {
     }
     
     addItemToInventory(item) {
+        // Handle special items that unlock abilities
+        if (item.name === 'Telepathy Crystal') {
+            this.unlockPlayerAbility('telepathy');
+            this.hud.showMessage('Telepathy ability unlocked!');
+            return true;
+        }
+        
+        if (item.name === 'Time Crystal') {
+            this.unlockPlayerAbility('timePerception');
+            this.hud.showMessage('Time perception ability unlocked!');
+            return true;
+        }
+        
+        // Handle consumable items
+        if (item.type === 'consumable') {
+            this.useConsumable(item);
+            return true;
+        }
+        
         // Find empty slot
         for (let i = 0; i < this.playerData.inventory.length; i++) {
             if (!this.playerData.inventory[i]) {
@@ -517,13 +540,36 @@ class Game {
         for (let i = 0; i < this.playerData.inventory.length; i++) {
             const existingItem = this.playerData.inventory[i];
             if (existingItem && existingItem.name === item.name) {
-                existingItem.count = (existingItem.count || 1) + (item.count || 1);
-                this.hud.updateInventory(this.playerData.inventory);
-                return true;
+                const maxStack = ITEM_DATA[item.name]?.maxStack || 64;
+                if (existingItem.count < maxStack) {
+                    existingItem.count = (existingItem.count || 1) + (item.count || 1);
+                    this.hud.updateInventory(this.playerData.inventory);
+                    return true;
+                }
             }
         }
         
         return false; // Inventory full
+    }
+    
+    useConsumable(item) {
+        const itemData = ITEM_DATA[item.name];
+        if (!itemData) return;
+        
+        if (itemData.healthRestore) {
+            this.player.heal(itemData.healthRestore);
+            this.hud.showMessage(`Restored ${itemData.healthRestore} health!`);
+        }
+        
+        if (itemData.energyRestore) {
+            this.player.restoreEnergy(itemData.energyRestore);
+            this.hud.showMessage(`Restored ${itemData.energyRestore} energy!`);
+        }
+        
+        if (itemData.effect === 'enhances_photosynthesis') {
+            this.player.sunlightBonus *= 1.5; // Enhance photosynthesis
+            this.hud.showMessage('Photosynthesis enhanced!');
+        }
     }
     
     removeItemFromInventory(itemName, count = 1) {
@@ -757,6 +803,11 @@ class Game {
             return true;
         }
         return false;
+    }
+    
+    setTimeScale(scale) {
+        this.timeScale = scale;
+        console.log(`Time scale set to: ${scale}`);
     }
 
     connectSystems() {

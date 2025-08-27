@@ -94,6 +94,31 @@ class Controls {
                         }
                     }
                 }
+                
+                // Handle ability activations
+                if (['telepathy', 'timePerception'].includes(action)) {
+                    if (window.game && window.game.player) {
+                        const success = window.game.player.useAbility(action);
+                        if (success) {
+                            // Show ability activation feedback
+                            if (window.game.hud) {
+                                window.game.hud.showMessage(`${action} activated!`);
+                            }
+                        } else {
+                            // Show failure feedback
+                            if (window.game.hud) {
+                                const player = window.game.player;
+                                if (!player.abilities[action]) {
+                                    window.game.hud.showMessage(`${action} not unlocked!`);
+                                } else if (player.getAbilityCooldown(action) > 0) {
+                                    window.game.hud.showMessage(`${action} on cooldown!`);
+                                } else if (player.energy < player.abilityCosts[action]) {
+                                    window.game.hud.showMessage(`Not enough energy for ${action}!`);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         });
         
